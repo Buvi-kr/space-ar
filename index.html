@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포천 아트밸리 소원 우주선 (V4 최종)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    width: 100vw; height: 100vh;
+    background: radial-gradient(circle at 50% 100%, #0a1b3f 0%, #01030a 80%);
+    overflow: hidden;
+    font-family: 'Nanum Pen Script', cursive;
+    
+    /* 🛡️ 더블탭 확대, 스크롤, 꾹 누르기 완벽 방지 */
+    user-select: none; 
+    touch-action: none;
+    -webkit-touch-callout: none; 
+    
+    perspective: 1200px;
+    transition: box-shadow 0.3s;
+  }
+
+  body.admin-mode { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8); }
+  #stars-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+  @keyframes pixelShift {
+    0% { transform: translate(0px, 0px); }
+    25% { transform: translate(3px, 1px); }
+    50% { transform: translate(-2px, -3px); }
+    75% { transform: translate(-1px, 2px); }
+    100% { transform: translate(2px, -1px); }
+  }
+
+  #ground-base {
+    position: absolute; bottom: -20vh; left: -10vw;
+    width: 120vw; height: 35vh;
+    background: radial-gradient(ellipse at 50% 20%, #0f305c, #020510);
+    border-top: 3px solid rgba(100, 200, 255, 0.4);
+    border-radius: 50% 50% 0 0;
+    box-shadow: 0 -30px 100px rgba(0, 100, 255, 0.3);
+    z-index: 10;
+    animation: pixelShift 120s infinite alternate; 
+  }
+
+  #main-title {
+    position: absolute; top: 50px; left: 60px; z-index: 20;
+    color: #fff; font-family: 'Black Han Sans', sans-serif;
+    font-size: 55px; letter-spacing: 4px;
+    text-shadow: 0 0 25px rgba(100,200,255,0.9);
+    animation: pixelShift 90s infinite alternate; 
+  }
+
+  /* 📺 전체화면 버튼 (왼쪽 상단) */
+  #fullscreen-btn {
+    position: absolute; top: 30px; right: 30px; /* 관리자 존을 피해 좌측 상단이나 적당한 곳 배치 */
+    z-index: 1000;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #fff; border-radius: 8px; font-size: 20px;
+    font-family: 'Black Han Sans', sans-serif;
+    cursor: pointer; backdrop-filter: blur(5px);
+    transition: 0.2s;
+  }
+  #fullscreen-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+  #admin-secret-zone {
+    position: absolute; top: 0; right: 0; width: 150px; height: 150px; z-index: 1000;
+  }
+
+  #scene {
+    position: absolute; inset: 0; z-index: 5;
+    transform-style: preserve-3d; transform: rotateX(-10deg); 
+  }
+  
+  #core-nebula {
+    position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, #fff 0%, #00d2ff 20%, #8a2be2 60%, transparent 100%);
+    border-radius: 50%; box-shadow: 0 0 100px #00d2ff, 0 0 200px #8a2be2;
+    animation: corePulse 4s infinite alternate;
+  }
+  @keyframes corePulse { 0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; } 100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } }
+
+  .wish-card {
+    position: absolute; top: 45%; left: 50%;
+    width: 320px; height: 180px; margin-left: -160px; margin-top: -90px;
+    background: rgba(10, 25, 60, 0.65); backdrop-filter: blur(8px);
+    border: 2px solid rgba(100, 200, 255, 0.7); border-radius: 16px;
+    box-shadow: 0 0 30px rgba(0, 150, 255, 0.5), inset 0 0 15px rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center; padding: 10px;
+    transform-style: preserve-3d; pointer-events: none; transition: border-color 0.2s;
+  }
+  .wish-card img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 0 6px rgba(255,255,255,1)); }
+  
+  .drone-base {
+    position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 25px; background: linear-gradient(to bottom, #cfd9df, #e2ebf0);
+    border: 2px solid #888; border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 5px 10px rgba(255,255,255,0.5);
+    display: flex; justify-content: space-between; align-items: center; padding: 0 15px;
+  }
+  .drone-thruster {
+    width: 20px; height: 35px; background: radial-gradient(ellipse, #ffffff 10%, #00d2ff 40%, transparent 80%);
+    border-radius: 50%; transform: translateY(15px); filter: blur(2px);
+    animation: thrusterPulse 0.3s infinite alternate;
+  }
+  @keyframes thrusterPulse { 0% { transform: translateY(15px) scale(0.9); opacity: 0.8; } 100% { transform: translateY(20px) scale(1.1); opacity: 1; } }
+
+  body.admin-mode .wish-card { pointer-events: auto; cursor: pointer; border: 3px solid #ff4444; }
+  body.admin-mode .wish-card:hover { background: rgba(255, 0, 0, 0.2); }
+
+  #open-btn {
+    position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+    padding: 25px 80px; font-size: 45px;
+    background: rgba(0, 200, 255, 0.1); backdrop-filter: blur(10px);
+    color: #fff; border: 3px solid #00d2ff; border-radius: 60px;
+    cursor: pointer; z-index: 100; font-family: 'Black Han Sans', sans-serif;
+    box-shadow: 0 0 40px rgba(0, 200, 255, 0.5); transition: all 0.2s;
+  }
+  #open-btn:active { transform: translateX(-50%) scale(0.95); }
+
+  #draw-ui {
+    position: absolute; bottom: -800px; left: 50%; transform: translateX(-50%);
+    width: 900px; background: rgba(5, 15, 35, 0.9);
+    backdrop-filter: blur(20px); border: 3px solid rgba(100, 200, 255, 0.6);
+    border-radius: 30px 30px 0 0; box-shadow: 0 -20px 80px rgba(0, 0, 0, 0.8);
+    z-index: 200; display: flex; flex-direction: column; align-items: center;
+    padding: 40px 30px; transition: bottom 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  #draw-ui.open { bottom: 0; }
+
+  #draw-canvas {
+    background: rgba(255,255,255,0.05); border-radius: 16px;
+    width: 800px; height: 450px; touch-action: none; cursor: crosshair;
+    margin-bottom: 20px; border: 2px dashed rgba(100, 200, 255, 0.4);
+  }
+
+  #warning-msg { color: #ff4444; font-size: 28px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; }
+  
+  .btn-group { display: flex; gap: 30px; }
+  .btn-group button {
+    padding: 20px 50px; font-size: 35px; border: none; border-radius: 16px;
+    font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: 0.1s;
+  }
+  .btn-group button:active { transform: scale(0.95); }
+  #clear-btn { background: #444; color: #fff; }
+  #cancel-btn { background: #666; color: #fff; }
+  #submit-btn { background: #00d2ff; color: #000; box-shadow: 0 0 30px rgba(0,210,255,0.5); }
+</style>
+</head>
+<body oncontextmenu="return false;"> <canvas id="stars-canvas"></canvas>
+<div id="ground-base"></div>
+<div id="scene"><div id="core-nebula"></div></div>
+
+<div id="main-title">포천 아트밸리 소원 우주선</div>
+
+<button id="fullscreen-btn">🖥️ 전체화면 시작</button>
+
+<button id="open-btn">소원 띄우기 🚀</button>
+<div id="admin-secret-zone"></div>
+
+<div id="draw-ui">
+  <h3 style="color:#fff; margin:0 0 10px 0; font-size: 45px; font-family: 'Nanum Pen Script', cursive;">
+    손가락으로 소원을 그려주세요!
+  </h3>
+  <div id="warning-msg">소원을 먼저 그려야 우주로 보낼 수 있습니다!</div>
+  <canvas id="draw-canvas" width="800" height="450"></canvas>
+  <div class="btn-group">
+    <button id="clear-btn">지우기</button>
+    <button id="cancel-btn">접기</button>
+    <button id="submit-btn">궤도로 발사 ✨</button>
+  </div>
+</div>
+
+<script>
+// --- 📺 전체화면 로직 ---
+const fsBtn = document.getElementById('fullscreen-btn');
+fsBtn.addEventListener('click', () => {
+  // 브라우저에 전체화면 요청
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      // 전체화면 진입 성공 시 버튼을 화면에서 영구히 숨김 (키오스크 모드)
+      fsBtn.style.display = 'none';
+    }).catch(err => {
+      alert(`전체화면을 실행할 수 없습니다: ${err.message}`);
+    });
+  }
+});
+
+// --- 별 배경 ---
+const scanvas = document.getElementById('stars-canvas');
+const sctx = scanvas.getContext('2d');
+let w, h, stars = [];
+window.addEventListener('resize', () => {
+  w = scanvas.width = window.innerWidth; h = scanvas.height = window.innerHeight;
+  stars = Array.from({length: 400}, () => ({
+    x: Math.random() * w, y: Math.random() * h,
+    r: Math.random() * 2, speed: Math.random() * 0.2 + 0.05,
+    twinkle: Math.random() * Math.PI * 2
+  }));
+});
+window.dispatchEvent(new Event('resize'));
+
+function drawStars() {
+  sctx.clearRect(0, 0, w, h);
+  stars.forEach(s => {
+    s.y -= s.speed; if(s.y < 0) { s.y = h; s.x = Math.random() * w; }
+    s.twinkle += 0.02;
+    sctx.beginPath(); sctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    sctx.fillStyle = `rgba(255, 255, 255, ${0.2 + 0.8 * Math.abs(Math.sin(s.twinkle))})`;
+    sctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// --- 캔버스 드로잉 ---
+const canvas = document.getElementById('draw-canvas');
+const ctx = canvas.getContext('2d');
+let isDrawing = false;
+let hasDrawn = false; 
+
+ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
+}
+function startDraw(e) { e.preventDefault(); isDrawing = true; resetIdleTimer(); ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }
+function doDraw(e) { e.preventDefault(); if(!isDrawing) return; resetIdleTimer(); hasDrawn = true; ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); document.getElementById('warning-msg').style.opacity = '0'; }
+function endDraw() { isDrawing = false; }
+
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', doDraw);
+window.addEventListener('mouseup', endDraw);
+canvas.addEventListener('touchstart', startDraw, {passive:false});
+canvas.addEventListener('touchmove', doDraw, {passive:false});
+window.addEventListener('touchend', endDraw);
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  ctx.clearRect(0,0, canvas.width, canvas.height);
+  hasDrawn = false;
+  resetIdleTimer();
+});
+
+// --- UI 제어 및 방치 타이머 ---
+const drawUI = document.getElementById('draw-ui');
+const openBtn = document.getElementById('open-btn');
+let idleTimer;
+
+function closeDrawUI() {
+  drawUI.classList.remove('open');
+  openBtn.style.transform = 'translateX(-50%)';
+  clearTimeout(idleTimer);
+}
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  if(drawUI.classList.contains('open')) {
+    idleTimer = setTimeout(() => {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      hasDrawn = false;
+      closeDrawUI(); 
+    }, 30000);
+  }
+}
+
+openBtn.addEventListener('click', () => {
+  ctx.clearRect(0,0, canvas.width, canvas.height);
+  hasDrawn = false;
+  document.getElementById('warning-msg').style.opacity = '0';
+  drawUI.classList.add('open');
+  openBtn.style.transform = 'translate(-50%, 200px)';
+  resetIdleTimer();
+});
+document.getElementById('cancel-btn').addEventListener('click', closeDrawUI);
+
+
+// --- 큐 시스템 & 궤도 로직 ---
+const scene = document.getElementById('scene');
+const MAX_ORBITS = 20; 
+const ORBIT_RADIUS = 600; 
+let slots = new Array(MAX_ORBITS).fill(null); 
+let allWishes = []; 
+let launchQueue = []; 
+let isLaunching = false; 
+
+document.getElementById('submit-btn').addEventListener('click', () => {
+  if(!hasDrawn) {
+    document.getElementById('warning-msg').style.opacity = '1';
+    return; 
+  }
+  
+  const dataURL = canvas.toDataURL('image/webp', 0.8); 
+  closeDrawUI();
+  
+  launchQueue.push(dataURL);
+  processQueue();
+});
+
+function processQueue() {
+  if (launchQueue.length === 0 || isLaunching) return;
+
+  isLaunching = true;
+  const nextWishData = launchQueue.shift(); 
+  launchNewWish(nextWishData);
+
+  setTimeout(() => {
+    isLaunching = false;
+    processQueue(); 
+  }, 3500); 
+}
+
+function getOrbit3DPosition(slotIndex, currentAngle) {
+  const tiltLimit = 25 * (Math.PI / 180);
+  const tiltX = -tiltLimit + (tiltLimit * 2 * (slotIndex / (MAX_ORBITS - 1)));
+  const panY = slotIndex * 137.5 * (Math.PI / 180);
+
+  const x0 = ORBIT_RADIUS * Math.cos(currentAngle);
+  const z0 = ORBIT_RADIUS * Math.sin(currentAngle);
+  const y1 = z0 * Math.sin(tiltX);
+  const z1 = z0 * Math.cos(tiltX);
+
+  const x2 = x0 * Math.cos(panY) + z1 * Math.sin(panY);
+  const z2 = -x0 * Math.sin(panY) + z1 * Math.cos(panY);
+
+  return { x: x2, y: y1, z: z2 };
+}
+
+function lerp(start, end, t) { return start * (1 - t) + end * t; }
+
+function launchNewWish(imgSrc) {
+  const card = document.createElement('div');
+  card.className = 'wish-card';
+  card.innerHTML = `<img src="${imgSrc}"><div class="drone-base"><div class="drone-thruster"></div><div class="drone-thruster"></div></div>`;
+  scene.appendChild(card);
+
+  const newWish = {
+    el: card, createdAt: Date.now(), state: 'launch', 
+    slotIndex: -1, orbitAngle: Math.random() * Math.PI * 2,
+    speed: 0.002 + Math.random() * 0.001, 
+    curX: 0, curY: 500, curZ: 0, departVx: 0, departVy: 0, departVz: 0
+  };
+
+  card.addEventListener('click', () => {
+    if(isAdminMode) {
+      card.remove(); 
+      slots[newWish.slotIndex] = null; 
+      allWishes = allWishes.filter(w => w !== newWish); 
+    }
+  });
+
+  let emptySlot = slots.findIndex(s => s === null);
+  if (emptySlot !== -1) {
+    newWish.slotIndex = emptySlot;
+    slots[emptySlot] = newWish;
+  } else {
+    let oldestIndex = 0; let oldestAge = 0;
+    slots.forEach((wish, idx) => {
+      if(wish && Date.now() - wish.createdAt > oldestAge) {
+        oldestAge = Date.now() - wish.createdAt; oldestIndex = idx;
+      }
+    });
+    if(slots[oldestIndex]) {
+      let departingWish = slots[oldestIndex];
+      departingWish.state = 'depart';
+      departingWish.departVx = (Math.random() - 0.5) * 10;
+      departingWish.departVy = -5 - Math.random() * 5; 
+      departingWish.departVz = -10; 
+    }
+    newWish.slotIndex = oldestIndex;
+    slots[oldestIndex] = newWish;
+  }
+  allWishes.push(newWish);
+}
+
+function animateUniverse() {
+  const now = Date.now();
+  for (let i = allWishes.length - 1; i >= 0; i--) {
+    let wish = allWishes[i];
+    let age = now - wish.createdAt;
+
+    if (age < 1500 && wish.state !== 'depart') {
+      let t = age / 1500; let ease = 1 - Math.pow(1 - t, 3);
+      wish.curX = lerp(0, 0, ease); wish.curY = lerp(500, 0, ease); wish.curZ = lerp(0, 500, ease); 
+      wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1.2)`;
+    }
+    else if (age >= 1500 && age < 3500 && wish.state !== 'depart') {
+      wish.curX = Math.sin(age * 0.002) * 10; wish.curY = Math.cos(age * 0.0015) * 10; wish.curZ = 500;
+      wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1.2)`;
+    }
+    else if (age >= 3500 && age < 6500 && wish.state !== 'depart') {
+      let t = (age - 3500) / 3000; let ease = t * t * (3 - 2 * t); 
+      wish.orbitAngle += wish.speed; 
+      let target = getOrbit3DPosition(wish.slotIndex, wish.orbitAngle);
+      wish.curX = lerp(wish.curX, target.x, ease); wish.curY = lerp(wish.curY, target.y, ease); wish.curZ = lerp(wish.curZ, target.z, ease);
+      wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(${lerp(1.2, 1, ease)})`;
+    }
+    else if (age >= 6500 && wish.state !== 'depart') {
+      wish.orbitAngle += wish.speed;
+      let pos = getOrbit3DPosition(wish.slotIndex, wish.orbitAngle);
+      wish.curX = pos.x; wish.curY = pos.y; wish.curZ = pos.z;
+      wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1)`;
+    }
+    else if (wish.state === 'depart') {
+      wish.curX += wish.departVx; wish.curY += wish.departVy; wish.curZ += wish.departVz; 
+      let opacity = parseFloat(wish.el.style.opacity || 1) - 0.008; 
+      wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(0.8)`;
+      wish.el.style.opacity = opacity;
+      if (opacity <= 0 || wish.curZ < -2000) { wish.el.remove(); allWishes.splice(i, 1); }
+    }
+  }
+  requestAnimationFrame(animateUniverse);
+}
+animateUniverse();
+
+// --- 숨겨진 관리자 모드 로직 ---
+let adminClicks = 0;
+let adminTimer;
+let isAdminMode = false;
+
+document.getElementById('admin-secret-zone').addEventListener('click', () => {
+  adminClicks++;
+  clearTimeout(adminTimer);
+  
+  adminTimer = setTimeout(() => { adminClicks = 0; }, 2000);
+  
+  if(adminClicks >= 5) {
+    isAdminMode = !isAdminMode; 
+    adminClicks = 0;
+    
+    if(isAdminMode) {
+      document.body.classList.add('admin-mode');
+      alert("⚠️ [관리자 모드 켜짐]\n삭제하고 싶은 소원을 터치하세요.\n다시 우측 상단을 5번 터치하면 꺼집니다.");
+    } else {
+      document.body.classList.remove('admin-mode');
+      alert("✅ [관리자 모드 꺼짐]");
+    }
+  }
+});
+
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>포천 아트밸리 소원 우주선 (V9 FHD 완벽 최적화)</title>
+<title>포천 아트밸리 소원 우주선 (V10 최종 완성본)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
 
@@ -20,9 +20,9 @@
   body.admin-mode { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8); }
   #stars-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
-  /* 지표면 가시성 확보: -110vh -> -82vh 로 상향 조정 */
+  /* 🌍 지표면: 화면 하단에 딱 120px 정도만 보이도록 고정 */
   #earth-ground {
-    position: absolute; bottom: -82vh; left: -20vw;
+    position: absolute; bottom: calc(-110vh + 120px); left: -20vw;
     width: 140vw; height: 110vh; border-radius: 50%;
     background: radial-gradient(circle at 50% 15%, #3a88c7 0%, #1e5b96 30%, #0d3054 60%, #010912 100%);
     box-shadow: inset 0 30px 60px rgba(255, 255, 255, 0.3), inset 0 80px 120px rgba(100, 200, 255, 0.2), 0 -20px 80px rgba(50, 150, 255, 0.4);
@@ -34,9 +34,9 @@
   }
 
   #main-title {
-    position: absolute; top: 50px; left: 60px; z-index: 20;
+    position: absolute; top: 40px; left: 50px; z-index: 20;
     color: #fff; font-family: 'Black Han Sans', sans-serif;
-    font-size: 55px; letter-spacing: 4px; text-shadow: 0 0 25px rgba(255, 200, 100, 0.6); 
+    font-size: 50px; letter-spacing: 4px; text-shadow: 0 0 25px rgba(255, 200, 100, 0.6); 
   }
 
   #fullscreen-btn {
@@ -58,76 +58,73 @@
 
   #admin-secret-zone { position: absolute; top: 0; right: 0; width: 150px; height: 150px; z-index: 1000; }
 
-  #scene { position: absolute; inset: 0; z-index: 5; transform-style: preserve-3d; transform: rotateX(-10deg); }
+  #scene { position: absolute; inset: 0; z-index: 5; transform-style: preserve-3d; transform: rotateX(-5deg); }
   
-  /* 태양: Z축을 150px 앞으로 당겨서 궤도보다 확실히 앞에 위치하도록 함 */
+  /* ☀️ 태양: 실제 NASA 태양 이미지 적용 및 위치 상향 */
   #core-sun {
-    position: absolute; top: 40%; left: 50%; 
-    transform: translate3d(-50%, -50%, 150px);
-    width: 220px; height: 220px; border-radius: 50%;
-    background: radial-gradient(circle, #ffffff 0%, #fffa8c 10%, #ffcb14 40%, #fb8c00 75%, transparent 100%);
-    box-shadow: 0 0 100px #ffcc00, 0 0 200px rgba(251, 140, 0, 0.8), inset 0 0 30px #ffffff, 0 0 400px rgba(255, 150, 0, 0.4), 0 0 600px rgba(255, 100, 0, 0.2); 
-    animation: sunPulse 4s infinite alternate; z-index: 50; /* Z-index 부여 */
-  }
-  #core-sun::after { 
-    content: ''; position: absolute; inset: 50px; border-radius: 50%;
-    background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0) 80%); opacity: 0.8;
+    position: absolute; top: 25%; left: 50%; /* 화면 위쪽으로 올림 */
+    transform: translate3d(-50%, -50%, 200px); /* Z축으로 200px 당겨서 항상 궤도보다 앞에 보이게 함 */
+    width: 250px; height: 250px; border-radius: 50%;
+    /* 실제 태양 이미지 (위키미디어 공용 - NASA SDO) */
+    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/600px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg') center/cover;
+    box-shadow: 0 0 100px #ffcc00, 0 0 250px rgba(251, 140, 0, 0.8), inset 0 0 40px rgba(255, 255, 255, 0.5), 0 0 500px rgba(255, 100, 0, 0.4); 
+    animation: sunPulse 4s infinite alternate; z-index: 100; /* 레이어 최상단 */
   }
   @keyframes sunPulse { 
-      0% { transform: translate3d(-50%, -50%, 150px) scale(0.98); opacity: 0.95; box-shadow: 0 0 100px #ffcc00, 0 0 200px rgba(251, 140, 0, 0.6), inset 0 0 30px #ffffff; } 
-      100% { transform: translate3d(-50%, -50%, 150px) scale(1.02); opacity: 1; box-shadow: 0 0 150px #ffcc00, 0 0 350px rgba(251, 140, 0, 0.9), inset 0 0 30px #ffffff; } 
+      0% { transform: translate3d(-50%, -50%, 200px) scale(0.98); box-shadow: 0 0 100px #ffcc00, 0 0 200px rgba(251, 140, 0, 0.6); } 
+      100% { transform: translate3d(-50%, -50%, 200px) scale(1.02); box-shadow: 0 0 150px #ffcc00, 0 0 350px rgba(251, 140, 0, 0.9); } 
   }
 
-  /* 말풍선 소원 카드 스타일 */
+  /* 💬 말풍선 소원 카드 */
   .wish-card {
-    position: absolute; top: 40%; left: 50%; 
+    position: absolute; top: 50%; left: 50%; /* 기준점을 중앙으로 */
     width: 320px; height: 180px; margin-left: -160px; margin-top: -90px;
-    background: rgba(10, 25, 60, 0.85); border-radius: 25px; /* 동글동글하게 */
+    background: rgba(10, 25, 60, 0.85); border-radius: 30px; /* 말풍선처럼 둥글게 */
     display: flex; align-items: center; justify-content: center; padding: 15px;
     transform-style: preserve-3d; pointer-events: none; transition: border-color 0.2s;
   }
   .wish-card img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); z-index: 5; }
   
-  /* 말풍선 꼬리 (테두리 색상용) */
+  /* 말풍선 꼬리 */
   .speech-tail {
     position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
     border-left: 18px solid transparent; border-right: 18px solid transparent;
     z-index: 2;
   }
-  /* 말풍선 꼬리 (배경색 채우기용) */
   .speech-tail-inner {
     position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%);
     border-left: 14px solid transparent; border-right: 14px solid transparent;
     border-top: 14px solid rgba(10, 25, 60, 0.85); z-index: 3;
   }
 
-  /* 분리된 하단 드론 우주선 */
+  /* 🚀 분리된 하단 우주선 추진체 */
   .drone-base {
-    position: absolute; bottom: -45px; /* 말풍선 꼬리 아래에 위치 */
+    position: absolute; bottom: -50px; /* 말풍선 바로 아래에 우주선 엔진 배치 */
     left: 50%; transform: translateX(-50%);
-    width: 120px; height: 22px; background: linear-gradient(to bottom, #cfd9df, #e2ebf0);
+    width: 130px; height: 25px; background: linear-gradient(to bottom, #cfd9df, #e2ebf0);
     border: 2px solid #888; border-radius: 12px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 5px 10px rgba(255,255,255,0.5);
-    display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 4;
+    display: flex; justify-content: space-between; align-items: center; padding: 0 18px; z-index: 4;
   }
   .drone-thruster {
-    width: 20px; height: 35px; border-radius: 50%; transform: translateY(15px);
+    width: 22px; height: 40px; border-radius: 50%; transform: translateY(18px);
     animation: thrusterPulse 0.3s infinite alternate;
   }
-  @keyframes thrusterPulse { 0% { transform: translateY(12px) scale(0.9); opacity: 0.8; } 100% { transform: translateY(18px) scale(1.1); opacity: 1; } }
+  @keyframes thrusterPulse { 0% { transform: translateY(15px) scale(0.9); opacity: 0.8; } 100% { transform: translateY(22px) scale(1.1); opacity: 1; } }
 
   body.admin-mode .wish-card { pointer-events: auto; cursor: pointer; border: 3px solid #ff4444 !important; }
   body.admin-mode .wish-card:hover { background: rgba(255, 0, 0, 0.4); }
 
   #open-btn {
-    position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
-    padding: 25px 80px; font-size: 45px; background: rgba(40, 40, 40, 0.8);
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    padding: 20px 70px; font-size: 40px; background: rgba(40, 40, 40, 0.8);
     color: #fff; border: 3px solid #ffffff; border-radius: 60px;
     cursor: pointer; z-index: 100; font-family: 'Black Han Sans', sans-serif;
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.3); transition: all 0.2s;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); transition: all 0.2s;
   }
   #open-btn:active { transform: translateX(-50%) scale(0.95); }
 
+  /* UI 화면 최적화 */
   #draw-ui {
     position: absolute; bottom: -900px; left: 50%; transform: translateX(-50%);
     width: 950px; background: rgba(5, 15, 35, 0.98); border: 3px solid #ffffff;
@@ -201,12 +198,11 @@
 </div>
 
 <script>
-// --- 💾 순정 HTML 다운로드 ---
+// --- 💾 다운로드 로직 ---
 document.getElementById('download-btn').addEventListener('click', () => {
   const clone = document.documentElement.cloneNode(true);
   const sceneClone = clone.querySelector('#scene');
-  const cards = sceneClone.querySelectorAll('.wish-card');
-  cards.forEach(c => c.remove());
+  sceneClone.querySelectorAll('.wish-card').forEach(c => c.remove());
   clone.querySelector('body').classList.remove('admin-mode');
   clone.querySelector('#fullscreen-btn').style.display = '';
   clone.querySelector('#draw-ui').classList.remove('open');
@@ -226,7 +222,7 @@ fsBtn.addEventListener('click', () => {
   }
 });
 
-// --- 배경 ---
+// --- 배경 별 생성 ---
 const scanvas = document.getElementById('stars-canvas');
 const sctx = scanvas.getContext('2d');
 let w, h, stars = [];
@@ -248,7 +244,7 @@ function drawStars() {
 }
 drawStars();
 
-// --- 드로잉 ---
+// --- 드로잉 캔버스 ---
 const canvas = document.getElementById('draw-canvas');
 const ctx = canvas.getContext('2d');
 let isDrawing = false; let hasDrawn = false; 
@@ -294,18 +290,21 @@ function resetIdleTimer() { clearTimeout(idleTimer); if(drawUI.classList.contain
 openBtn.addEventListener('click', () => { ctx.clearRect(0,0, canvas.width, canvas.height); hasDrawn = false; document.getElementById('warning-msg').style.opacity = '0'; drawUI.classList.add('open'); openBtn.style.transform = 'translate(-50%, 200px)'; resetIdleTimer(); });
 document.getElementById('cancel-btn').addEventListener('click', closeDrawUI);
 
-// --- 🚀 우주선 및 궤도 로직 ---
+// --- 🚀 1920x1080 타원형 우주선 궤도 로직 ---
 const scene = document.getElementById('scene');
 const MAX_ORBITS = 12; 
 
-// FHD (1920x1080) 맞춤 타원형 궤도 변수 (가로로 넓게)
-let ORBIT_RADIUS_X = window.innerWidth * 0.42; 
-let ORBIT_RADIUS_Z = window.innerWidth * 0.25;
-const ORBIT_Y_OFFSET = 130; // 태양보다 130px 아래에서 공전하도록 하향 조정
+// FHD 와이드 화면에 맞게 X축(가로)은 넓게, Z축(깊이)은 적당히 계산
+let ORBIT_RADIUS_X = window.innerWidth * 0.38; 
+let ORBIT_RADIUS_Z = window.innerWidth * 0.2;
+
+// 궤도의 중심을 화면 아래쪽으로 내려서, 우주선들이 태양 밑에서 공전하게 만듦
+let ORBIT_Y_OFFSET = window.innerHeight * 0.25; 
 
 window.addEventListener('resize', () => {
-  ORBIT_RADIUS_X = window.innerWidth * 0.42;
-  ORBIT_RADIUS_Z = window.innerWidth * 0.25;
+  ORBIT_RADIUS_X = window.innerWidth * 0.38;
+  ORBIT_RADIUS_Z = window.innerWidth * 0.2;
+  ORBIT_Y_OFFSET = window.innerHeight * 0.25;
 });
 
 let slots = new Array(MAX_ORBITS).fill(null); let allWishes = []; let launchQueue = []; let isLaunching = false; 
@@ -323,11 +322,10 @@ function processQueue() {
 }
 
 function getOrbit3DPosition(slotIndex, currentAngle) {
-  const tiltLimit = 20 * (Math.PI / 180); 
+  const tiltLimit = 15 * (Math.PI / 180); 
   const tiltX = -tiltLimit + (tiltLimit * 2 * (slotIndex / (MAX_ORBITS - 1))); 
   const panY = slotIndex * 137.5 * (Math.PI / 180);
 
-  // X축 반경과 Z축 반경을 다르게 주어 와이드 타원형 궤도 형성
   const x0 = ORBIT_RADIUS_X * Math.cos(currentAngle); 
   const z0 = ORBIT_RADIUS_Z * Math.sin(currentAngle);
   
@@ -337,7 +335,6 @@ function getOrbit3DPosition(slotIndex, currentAngle) {
   const x2 = x0 * Math.cos(panY) + z1 * Math.sin(panY); 
   const z2 = -x0 * Math.sin(panY) + z1 * Math.cos(panY);
   
-  // Y축 오프셋을 적용해 우주선들을 태양 아래로 내림
   return { x: x2, y: y1 + ORBIT_Y_OFFSET, z: z2 };
 }
 function lerp(start, end, t) { return start * (1 - t) + end * t; }
@@ -346,7 +343,7 @@ function launchNewWish(imgSrc, color) {
   const card = document.createElement('div'); card.className = 'wish-card'; 
   card.style.border = `3px solid ${color}`; card.style.boxShadow = `0 0 30px ${color}80, inset 0 0 15px ${color}40`;
   
-  // 말풍선 꼬리 및 드론 결합 HTML
+  // 말풍선 + 하단 로켓 결합 구조
   card.innerHTML = `
     <div class="speech-tail" style="border-top: 18px solid ${color};"></div>
     <div class="speech-tail-inner"></div>
@@ -379,10 +376,10 @@ function animateUniverse() {
     
     if (age < 1500 && wish.state !== 'depart') {
       let t = age / 1500; let ease = 1 - Math.pow(1 - t, 3);
-      wish.curX = lerp(0, 0, ease); wish.curY = lerp(800, ORBIT_Y_OFFSET, ease); wish.curZ = lerp(0, 300, ease); 
+      wish.curX = lerp(0, 0, ease); wish.curY = lerp(800, ORBIT_Y_OFFSET, ease); wish.curZ = lerp(0, 200, ease); 
       wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1.2)`;
     } else if (age >= 1500 && age < 3500 && wish.state !== 'depart') {
-      wish.curX = Math.sin(age * 0.002) * 10; wish.curY = Math.cos(age * 0.0015) * 10 + ORBIT_Y_OFFSET; wish.curZ = 300;
+      wish.curX = Math.sin(age * 0.002) * 10; wish.curY = Math.cos(age * 0.0015) * 10 + ORBIT_Y_OFFSET; wish.curZ = 200;
       wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1.2)`;
     } else if (age >= 3500 && age < 6500 && wish.state !== 'depart') {
       let t = (age - 3500) / 3000; let ease = t * t * (3 - 2 * t); 

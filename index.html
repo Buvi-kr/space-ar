@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>포천 아트밸리 소원 우주선 (V10 최종 완성본)</title>
+<title>포천 아트밸리 소원 우주선 (V11 최종 레이어 및 태양 수정)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
 
@@ -14,27 +14,55 @@
     background: radial-gradient(circle at 50% 50%, #050d21 0%, #010205 100%);
     overflow: hidden; font-family: 'Nanum Pen Script', cursive;
     user-select: none; touch-action: none; -webkit-touch-callout: none; 
-    perspective: 1200px; transition: box-shadow 0.3s;
+    perspective: 1200px;
   }
 
   body.admin-mode { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8); }
   #stars-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
-  /* 🌍 지표면: 화면 하단에 딱 120px 정도만 보이도록 고정 */
+  /* 1️⃣ 레이어 맨 아래: 지표면 (z-index: 2) */
   #earth-ground {
     position: absolute; bottom: calc(-110vh + 120px); left: -20vw;
     width: 140vw; height: 110vh; border-radius: 50%;
     background: radial-gradient(circle at 50% 15%, #3a88c7 0%, #1e5b96 30%, #0d3054 60%, #010912 100%);
     box-shadow: inset 0 30px 60px rgba(255, 255, 255, 0.3), inset 0 80px 120px rgba(100, 200, 255, 0.2), 0 -20px 80px rgba(50, 150, 255, 0.4);
-    z-index: 10;
+    z-index: 2; /* 궤도와 태양보다 무조건 뒤로 가도록 설정 */
   }
   #earth-ground::before {
     content: ''; position: absolute; inset: 0; border-radius: 50%;
     background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 40%), radial-gradient(ellipse at 70% 25%, rgba(255,255,255,0.08) 0%, transparent 35%);
   }
 
+  /* 2️⃣ 레이어 중간: 우주선 궤도 (z-index: 5) */
+  #scene { 
+    position: absolute; inset: 0; 
+    z-index: 5; 
+    transform-style: preserve-3d; transform: rotateX(-5deg); 
+  }
+
+  /* 3️⃣ 레이어 맨 위: 태양 (z-index: 100) + 한가운데 배치 */
+  #core-sun {
+    position: absolute; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); /* 화면 완벽한 정중앙 */
+    width: 320px; height: 320px; border-radius: 50%;
+    
+    /* 관리자님이 올리신 태양 이미지의 검은 테두리/배경을 완벽하게 투명하게 만드는 마법의 속성 */
+    mix-blend-mode: screen; 
+    
+    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/600px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg') center/cover no-repeat;
+    
+    box-shadow: 0 0 100px #ffcc00, 0 0 250px rgba(251, 140, 0, 0.8); 
+    animation: sunPulse 4s infinite alternate; 
+    z-index: 100; /* 맨 위로 덮음 */
+    pointer-events: none;
+  }
+  @keyframes sunPulse { 
+      0% { transform: translate(-50%, -50%) scale(0.98); box-shadow: 0 0 100px #ffcc00, 0 0 200px rgba(251, 140, 0, 0.6); } 
+      100% { transform: translate(-50%, -50%) scale(1.02); box-shadow: 0 0 150px #ffcc00, 0 0 350px rgba(251, 140, 0, 0.9); } 
+  }
+
   #main-title {
-    position: absolute; top: 40px; left: 50px; z-index: 20;
+    position: absolute; top: 40px; left: 50px; z-index: 200;
     color: #fff; font-family: 'Black Han Sans', sans-serif;
     font-size: 50px; letter-spacing: 4px; text-shadow: 0 0 25px rgba(255, 200, 100, 0.6); 
   }
@@ -58,38 +86,19 @@
 
   #admin-secret-zone { position: absolute; top: 0; right: 0; width: 150px; height: 150px; z-index: 1000; }
 
-  #scene { position: absolute; inset: 0; z-index: 5; transform-style: preserve-3d; transform: rotateX(-5deg); }
-  
-  /* ☀️ 태양: 실제 NASA 태양 이미지 적용 및 위치 상향 */
-  #core-sun {
-    position: absolute; top: 25%; left: 50%; /* 화면 위쪽으로 올림 */
-    transform: translate3d(-50%, -50%, 200px); /* Z축으로 200px 당겨서 항상 궤도보다 앞에 보이게 함 */
-    width: 250px; height: 250px; border-radius: 50%;
-    /* 실제 태양 이미지 (위키미디어 공용 - NASA SDO) */
-    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/600px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg') center/cover;
-    box-shadow: 0 0 100px #ffcc00, 0 0 250px rgba(251, 140, 0, 0.8), inset 0 0 40px rgba(255, 255, 255, 0.5), 0 0 500px rgba(255, 100, 0, 0.4); 
-    animation: sunPulse 4s infinite alternate; z-index: 100; /* 레이어 최상단 */
-  }
-  @keyframes sunPulse { 
-      0% { transform: translate3d(-50%, -50%, 200px) scale(0.98); box-shadow: 0 0 100px #ffcc00, 0 0 200px rgba(251, 140, 0, 0.6); } 
-      100% { transform: translate3d(-50%, -50%, 200px) scale(1.02); box-shadow: 0 0 150px #ffcc00, 0 0 350px rgba(251, 140, 0, 0.9); } 
-  }
-
   /* 💬 말풍선 소원 카드 */
   .wish-card {
-    position: absolute; top: 50%; left: 50%; /* 기준점을 중앙으로 */
+    position: absolute; top: 50%; left: 50%; 
     width: 320px; height: 180px; margin-left: -160px; margin-top: -90px;
-    background: rgba(10, 25, 60, 0.85); border-radius: 30px; /* 말풍선처럼 둥글게 */
+    background: rgba(10, 25, 60, 0.85); border-radius: 30px; 
     display: flex; align-items: center; justify-content: center; padding: 15px;
     transform-style: preserve-3d; pointer-events: none; transition: border-color 0.2s;
   }
   .wish-card img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); z-index: 5; }
   
-  /* 말풍선 꼬리 */
   .speech-tail {
     position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
-    border-left: 18px solid transparent; border-right: 18px solid transparent;
-    z-index: 2;
+    border-left: 18px solid transparent; border-right: 18px solid transparent; z-index: 2;
   }
   .speech-tail-inner {
     position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%);
@@ -99,7 +108,7 @@
 
   /* 🚀 분리된 하단 우주선 추진체 */
   .drone-base {
-    position: absolute; bottom: -50px; /* 말풍선 바로 아래에 우주선 엔진 배치 */
+    position: absolute; bottom: -50px; 
     left: 50%; transform: translateX(-50%);
     width: 130px; height: 25px; background: linear-gradient(to bottom, #cfd9df, #e2ebf0);
     border: 2px solid #888; border-radius: 12px;
@@ -124,7 +133,6 @@
   }
   #open-btn:active { transform: translateX(-50%) scale(0.95); }
 
-  /* UI 화면 최적화 */
   #draw-ui {
     position: absolute; bottom: -900px; left: 50%; transform: translateX(-50%);
     width: 950px; background: rgba(5, 15, 35, 0.98); border: 3px solid #ffffff;
@@ -158,8 +166,10 @@
 <body oncontextmenu="return false;">
 
 <canvas id="stars-canvas"></canvas>
+
 <div id="earth-ground"></div>
-<div id="scene"><div id="core-sun"></div></div>
+<div id="core-sun"></div> 
+<div id="scene"></div>
 
 <button id="download-btn">💾 원본 HTML 다운로드</button>
 
@@ -198,7 +208,6 @@
 </div>
 
 <script>
-// --- 💾 다운로드 로직 ---
 document.getElementById('download-btn').addEventListener('click', () => {
   const clone = document.documentElement.cloneNode(true);
   const sceneClone = clone.querySelector('#scene');
@@ -214,7 +223,6 @@ document.getElementById('download-btn').addEventListener('click', () => {
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 });
 
-// --- 전체화면 ---
 const fsBtn = document.getElementById('fullscreen-btn');
 fsBtn.addEventListener('click', () => {
   if (!document.fullscreenElement) {
@@ -222,7 +230,6 @@ fsBtn.addEventListener('click', () => {
   }
 });
 
-// --- 배경 별 생성 ---
 const scanvas = document.getElementById('stars-canvas');
 const sctx = scanvas.getContext('2d');
 let w, h, stars = [];
@@ -244,7 +251,6 @@ function drawStars() {
 }
 drawStars();
 
-// --- 드로잉 캔버스 ---
 const canvas = document.getElementById('draw-canvas');
 const ctx = canvas.getContext('2d');
 let isDrawing = false; let hasDrawn = false; 
@@ -283,28 +289,22 @@ canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousem
 canvas.addEventListener('touchstart', startDraw, {passive:false}); canvas.addEventListener('touchmove', doDraw, {passive:false}); window.addEventListener('touchend', endDraw);
 document.getElementById('clear-btn').addEventListener('click', () => { ctx.clearRect(0,0, canvas.width, canvas.height); hasDrawn = false; resetIdleTimer(); });
 
-// --- UI 제어 ---
 const drawUI = document.getElementById('draw-ui'); const openBtn = document.getElementById('open-btn'); let idleTimer;
 function closeDrawUI() { drawUI.classList.remove('open'); openBtn.style.transform = 'translateX(-50%)'; clearTimeout(idleTimer); }
 function resetIdleTimer() { clearTimeout(idleTimer); if(drawUI.classList.contains('open')) { idleTimer = setTimeout(() => { ctx.clearRect(0,0, canvas.width, canvas.height); hasDrawn = false; closeDrawUI(); }, 30000); } }
 openBtn.addEventListener('click', () => { ctx.clearRect(0,0, canvas.width, canvas.height); hasDrawn = false; document.getElementById('warning-msg').style.opacity = '0'; drawUI.classList.add('open'); openBtn.style.transform = 'translate(-50%, 200px)'; resetIdleTimer(); });
 document.getElementById('cancel-btn').addEventListener('click', closeDrawUI);
 
-// --- 🚀 1920x1080 타원형 우주선 궤도 로직 ---
 const scene = document.getElementById('scene');
 const MAX_ORBITS = 12; 
 
-// FHD 와이드 화면에 맞게 X축(가로)은 넓게, Z축(깊이)은 적당히 계산
 let ORBIT_RADIUS_X = window.innerWidth * 0.38; 
 let ORBIT_RADIUS_Z = window.innerWidth * 0.2;
-
-// 궤도의 중심을 화면 아래쪽으로 내려서, 우주선들이 태양 밑에서 공전하게 만듦
-let ORBIT_Y_OFFSET = window.innerHeight * 0.25; 
+let ORBIT_Y_OFFSET = 0; // 태양이 정중앙에 있으므로, 궤도 중심도 정중앙(0)으로 수정
 
 window.addEventListener('resize', () => {
   ORBIT_RADIUS_X = window.innerWidth * 0.38;
   ORBIT_RADIUS_Z = window.innerWidth * 0.2;
-  ORBIT_Y_OFFSET = window.innerHeight * 0.25;
 });
 
 let slots = new Array(MAX_ORBITS).fill(null); let allWishes = []; let launchQueue = []; let isLaunching = false; 
@@ -343,7 +343,6 @@ function launchNewWish(imgSrc, color) {
   const card = document.createElement('div'); card.className = 'wish-card'; 
   card.style.border = `3px solid ${color}`; card.style.boxShadow = `0 0 30px ${color}80, inset 0 0 15px ${color}40`;
   
-  // 말풍선 + 하단 로켓 결합 구조
   card.innerHTML = `
     <div class="speech-tail" style="border-top: 18px solid ${color};"></div>
     <div class="speech-tail-inner"></div>
@@ -402,7 +401,6 @@ function animateUniverse() {
 }
 animateUniverse();
 
-// --- 관리자 모드 ---
 let adminClicks = 0; let adminTimer; let isAdminMode = false;
 document.getElementById('admin-secret-zone').addEventListener('click', () => {
   adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 2000);

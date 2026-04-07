@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>포천 아트밸리 소원 우주선 (V7 최적화 및 스타일 변경 버전)</title>
+<title>포천 아트밸리 소원 우주선 (V8 궤도 이탈 완벽 해결)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
 
@@ -20,9 +20,8 @@
   body.admin-mode { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8); }
   #stars-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
-  /* 요청 수정 1: 지표면을 훨씬 아래로 내려 우주 공간 확보 */
   #earth-ground {
-    position: absolute; bottom: -110vh; left: -20vw; /* -80vh에서 -110vh로 대폭 하향 */
+    position: absolute; bottom: -110vh; left: -20vw;
     width: 140vw; height: 110vh; border-radius: 50%;
     background: radial-gradient(circle at 50% 15%, #3a88c7 0%, #1e5b96 30%, #0d3054 60%, #010912 100%);
     box-shadow: inset 0 30px 60px rgba(255, 255, 255, 0.3), inset 0 80px 120px rgba(100, 200, 255, 0.2), 0 -20px 80px rgba(50, 150, 255, 0.4);
@@ -61,22 +60,19 @@
 
   #scene { position: absolute; inset: 0; z-index: 5; transform-style: preserve-3d; transform: rotateX(-10deg); }
   
-  /* 요청 수정 2: 가운데 구를 태양처럼 더 사실적이고 화려하게 변경 */
   #core-sun {
     position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
     width: 220px; height: 220px; border-radius: 50%;
-    /* 더 복합적이고 사실적인 태양 그라데이션 */
     background: radial-gradient(circle, #ffffff 0%, #fffa8c 10%, #ffcb14 40%, #fb8c00 75%, transparent 100%);
-    /* 더 복합적이고 강력한 태양광 후광 효과 */
     box-shadow: 
         0 0 100px #ffcc00, 
         0 0 200px rgba(251, 140, 0, 0.8), 
         inset 0 0 30px #ffffff,
-        0 0 400px rgba(255, 150, 0, 0.4), /* 원거리 후광 */
-        0 0 600px rgba(255, 100, 0, 0.2); /* 매우 먼 원거리 halo */
-    animation: sunPulse 4s infinite alternate; /* 더 웅장하고 느린 펄스 */
+        0 0 400px rgba(255, 150, 0, 0.4), 
+        0 0 600px rgba(255, 100, 0, 0.2); 
+    animation: sunPulse 4s infinite alternate; 
   }
-  #core-sun::after { /* 태양 표면 상세 추가 */
+  #core-sun::after { 
     content: ''; position: absolute; inset: 50px; border-radius: 50%;
     background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0) 80%);
     opacity: 0.8;
@@ -160,7 +156,6 @@
 
 <div id="main-title">포천 아트밸리 소원 우주선</div>
 <button id="fullscreen-btn">🖥️ 전체화면 시작</button>
-
 <button id="open-btn">소원 적어 보내기! 🚀</button>
 
 <div id="admin-secret-zone"></div>
@@ -228,11 +223,13 @@ fsBtn.addEventListener('click', () => {
 const scanvas = document.getElementById('stars-canvas');
 const sctx = scanvas.getContext('2d');
 let w, h, stars = [];
+
 window.addEventListener('resize', () => {
   w = scanvas.width = window.innerWidth; h = scanvas.height = window.innerHeight;
   stars = Array.from({length: 150}, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2, speed: Math.random() * 0.1 + 0.05, twinkle: Math.random() * Math.PI * 2 }));
 });
 window.dispatchEvent(new Event('resize'));
+
 function drawStars() {
   sctx.clearRect(0, 0, w, h);
   stars.forEach(s => {
@@ -250,7 +247,6 @@ const ctx = canvas.getContext('2d');
 let isDrawing = false; let hasDrawn = false; 
 let currentPenColor = '#ffffff'; let currentPenSize = 5.6; 
 
-// 최적화: 그림자 제거로 필기감 향상
 function updateContext() {
   ctx.strokeStyle = currentPenColor; ctx.lineWidth = currentPenSize; 
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
@@ -291,9 +287,18 @@ function resetIdleTimer() { clearTimeout(idleTimer); if(drawUI.classList.contain
 openBtn.addEventListener('click', () => { ctx.clearRect(0,0, canvas.width, canvas.height); hasDrawn = false; document.getElementById('warning-msg').style.opacity = '0'; drawUI.classList.add('open'); openBtn.style.transform = 'translate(-50%, 200px)'; resetIdleTimer(); });
 document.getElementById('cancel-btn').addEventListener('click', closeDrawUI);
 
-// --- 우주선 로직 (최대 우주선 개수 12개) ---
+// --- 🚀 우주선 로직 (화면 밖으로 나가는 문제 해결) ---
 const scene = document.getElementById('scene');
-const MAX_ORBITS = 12; const ORBIT_RADIUS = 700; 
+const MAX_ORBITS = 12; 
+
+// 기존 고정값 700 대신, 화면 크기에 비례해서 반지름을 자동 계산하는 변수
+let ORBIT_RADIUS = Math.min(window.innerWidth, window.innerHeight) * 0.35; 
+
+// 창 크기가 변할 때마다 궤도 반지름도 같이 조절
+window.addEventListener('resize', () => {
+  ORBIT_RADIUS = Math.min(window.innerWidth, window.innerHeight) * 0.35;
+});
+
 let slots = new Array(MAX_ORBITS).fill(null); let allWishes = []; let launchQueue = []; let isLaunching = false; 
 
 document.getElementById('submit-btn').addEventListener('click', () => {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>포천 아트밸리 소원 우주선 (V7 최적화 버전)</title>
+<title>포천 아트밸리 소원 우주선 (V7 최적화 및 스타일 변경 버전)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
 
@@ -20,14 +20,14 @@
   body.admin-mode { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8); }
   #stars-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
+  /* 요청 수정 1: 지표면을 훨씬 아래로 내려 우주 공간 확보 */
   #earth-ground {
-    position: absolute; bottom: -80vh; left: -20vw;
+    position: absolute; bottom: -110vh; left: -20vw; /* -80vh에서 -110vh로 대폭 하향 */
     width: 140vw; height: 110vh; border-radius: 50%;
     background: radial-gradient(circle at 50% 15%, #3a88c7 0%, #1e5b96 30%, #0d3054 60%, #010912 100%);
     box-shadow: inset 0 30px 60px rgba(255, 255, 255, 0.3), inset 0 80px 120px rgba(100, 200, 255, 0.2), 0 -20px 80px rgba(50, 150, 255, 0.4);
     z-index: 10;
   }
-  /* 최적화: blur(15px) 제거 및 그라데이션 단순화 */
   #earth-ground::before {
     content: ''; position: absolute; inset: 0; border-radius: 50%;
     background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 40%), radial-gradient(ellipse at 70% 25%, rgba(255,255,255,0.08) 0%, transparent 35%);
@@ -39,7 +39,6 @@
     font-size: 55px; letter-spacing: 4px; text-shadow: 0 0 25px rgba(255, 200, 100, 0.6); 
   }
 
-  /* 최적화: backdrop-filter 제거 및 배경 불투명도 조절 */
   #fullscreen-btn {
     position: absolute; top: 30px; right: 30px; z-index: 1000;
     padding: 12px 24px; background: rgba(50, 50, 50, 0.8);
@@ -62,16 +61,31 @@
 
   #scene { position: absolute; inset: 0; z-index: 5; transform-style: preserve-3d; transform: rotateX(-10deg); }
   
+  /* 요청 수정 2: 가운데 구를 태양처럼 더 사실적이고 화려하게 변경 */
   #core-sun {
     position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
     width: 220px; height: 220px; border-radius: 50%;
-    background: radial-gradient(circle, #ffffff 0%, #fff7a1 20%, #ffb703 50%, #fb8500 80%, transparent 100%);
-    box-shadow: 0 0 100px #ffb703, 0 0 250px rgba(251, 133, 0, 0.8), inset 0 0 40px #ffffff;
-    animation: sunPulse 3s infinite alternate;
+    /* 더 복합적이고 사실적인 태양 그라데이션 */
+    background: radial-gradient(circle, #ffffff 0%, #fffa8c 10%, #ffcb14 40%, #fb8c00 75%, transparent 100%);
+    /* 더 복합적이고 강력한 태양광 후광 효과 */
+    box-shadow: 
+        0 0 100px #ffcc00, 
+        0 0 200px rgba(251, 140, 0, 0.8), 
+        inset 0 0 30px #ffffff,
+        0 0 400px rgba(255, 150, 0, 0.4), /* 원거리 후광 */
+        0 0 600px rgba(255, 100, 0, 0.2); /* 매우 먼 원거리 halo */
+    animation: sunPulse 4s infinite alternate; /* 더 웅장하고 느린 펄스 */
   }
-  @keyframes sunPulse { 0% { transform: translate(-50%, -50%) scale(0.97); opacity: 0.9; box-shadow: 0 0 100px #ffb703, 0 0 200px rgba(251, 133, 0, 0.6); } 100% { transform: translate(-50%, -50%) scale(1.03); opacity: 1; box-shadow: 0 0 150px #ffb703, 0 0 350px rgba(251, 133, 0, 0.9); } }
+  #core-sun::after { /* 태양 표면 상세 추가 */
+    content: ''; position: absolute; inset: 50px; border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0) 80%);
+    opacity: 0.8;
+  }
+  @keyframes sunPulse { 
+      0% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.95; box-shadow: 0 0 100px #ffcc00, 0 0 200px rgba(251, 140, 0, 0.6), inset 0 0 30px #ffffff; } 
+      100% { transform: translate(-50%, -50%) scale(1.02); opacity: 1; box-shadow: 0 0 150px #ffcc00, 0 0 350px rgba(251, 140, 0, 0.9), inset 0 0 30px #ffffff; } 
+  }
 
-  /* 최적화: backdrop-filter 제거 및 background rgba 조절 */
   .wish-card {
     position: absolute; top: 40%; left: 50%; 
     width: 320px; height: 180px; margin-left: -160px; margin-top: -90px;
@@ -88,7 +102,6 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 5px 10px rgba(255,255,255,0.5);
     display: flex; justify-content: space-between; align-items: center; padding: 0 15px;
   }
-  /* 최적화: filter: blur 제거 */
   .drone-thruster {
     width: 20px; height: 35px; border-radius: 50%; transform: translateY(15px);
     animation: thrusterPulse 0.3s infinite alternate;
@@ -98,7 +111,6 @@
   body.admin-mode .wish-card { pointer-events: auto; cursor: pointer; border: 3px solid #ff4444 !important; }
   body.admin-mode .wish-card:hover { background: rgba(255, 0, 0, 0.4); }
 
-  /* 최적화: backdrop-filter 제거 */
   #open-btn {
     position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
     padding: 25px 80px; font-size: 45px; background: rgba(40, 40, 40, 0.8);
@@ -108,7 +120,6 @@
   }
   #open-btn:active { transform: translateX(-50%) scale(0.95); }
 
-  /* 최적화: backdrop-filter 제거 */
   #draw-ui {
     position: absolute; bottom: -900px; left: 50%; transform: translateX(-50%);
     width: 950px; background: rgba(5, 15, 35, 0.98); border: 3px solid #ffffff;
@@ -149,7 +160,8 @@
 
 <div id="main-title">포천 아트밸리 소원 우주선</div>
 <button id="fullscreen-btn">🖥️ 전체화면 시작</button>
-<button id="open-btn">지구에서 띄우기 🚀</button>
+
+<button id="open-btn">소원 적어 보내기! 🚀</button>
 
 <div id="admin-secret-zone"></div>
 
@@ -212,7 +224,7 @@ fsBtn.addEventListener('click', () => {
   }
 });
 
-// --- 배경 (최적화: 별 개수 150개로 축소) ---
+// --- 배경 (별 개수 150개로 축소) ---
 const scanvas = document.getElementById('stars-canvas');
 const sctx = scanvas.getContext('2d');
 let w, h, stars = [];
@@ -238,7 +250,7 @@ const ctx = canvas.getContext('2d');
 let isDrawing = false; let hasDrawn = false; 
 let currentPenColor = '#ffffff'; let currentPenSize = 5.6; 
 
-// 최적화: 그림자(shadowBlur) 제거로 펜 렌더링 부하 최소화
+// 최적화: 그림자 제거로 필기감 향상
 function updateContext() {
   ctx.strokeStyle = currentPenColor; ctx.lineWidth = currentPenSize; 
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
@@ -257,7 +269,6 @@ document.querySelectorAll('.color-btn').forEach(btn => {
 document.querySelectorAll('.size-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-    // 소수점 굵기를 위해 parseFloat 사용
     currentPenSize = parseFloat(btn.dataset.size); updateContext();
   });
 });
@@ -280,7 +291,7 @@ function resetIdleTimer() { clearTimeout(idleTimer); if(drawUI.classList.contain
 openBtn.addEventListener('click', () => { ctx.clearRect(0,0, canvas.width, canvas.height); hasDrawn = false; document.getElementById('warning-msg').style.opacity = '0'; drawUI.classList.add('open'); openBtn.style.transform = 'translate(-50%, 200px)'; resetIdleTimer(); });
 document.getElementById('cancel-btn').addEventListener('click', closeDrawUI);
 
-// --- 우주선 로직 (최적화: 최대 우주선 개수 12개로 축소) ---
+// --- 우주선 로직 (최대 우주선 개수 12개) ---
 const scene = document.getElementById('scene');
 const MAX_ORBITS = 12; const ORBIT_RADIUS = 700; 
 let slots = new Array(MAX_ORBITS).fill(null); let allWishes = []; let launchQueue = []; let isLaunching = false; 

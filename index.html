@@ -11,7 +11,7 @@
   body {
     margin: 0; padding: 0;
     width: 100vw; height: 100vh;
-    background: radial-gradient(circle at 50% 50%, #050d21 0%, #010205 100%);
+    background: url('assets/bg.png') center/cover no-repeat, radial-gradient(circle at 50% 50%, #050d21 0%, #010205 100%);
     overflow: hidden; font-family: 'Nanum Pen Script', cursive;
     user-select: none; touch-action: none; -webkit-touch-callout: none; 
     perspective: 1200px;
@@ -22,10 +22,10 @@
 
   /* 1️⃣ 레이어 맨 아래: 지표면 (z-index: 2) */
   #earth-ground {
-    position: absolute; bottom: calc(-110vh + 120px); left: -20vw;
+    position: absolute; bottom: calc(-110vh + 100px); left: -20vw;
     width: 140vw; height: 110vh; border-radius: 50%;
-    background: radial-gradient(circle at 50% 15%, #3a88c7 0%, #1e5b96 30%, #0d3054 60%, #010912 100%);
-    box-shadow: inset 0 30px 60px rgba(255, 255, 255, 0.3), inset 0 80px 120px rgba(100, 200, 255, 0.2), 0 -20px 80px rgba(50, 150, 255, 0.4);
+    background: radial-gradient(circle at 50% 15%, rgba(15, 25, 45, 0.8) 0%, rgba(5, 10, 20, 0.9) 50%, #000 100%);
+    box-shadow: inset 0 30px 80px rgba(0, 0, 0, 0.8), 0 -30px 100px rgba(0, 0, 0, 0.9);
     z-index: 2; /* 궤도와 태양보다 무조건 뒤로 가도록 설정 */
   }
   #earth-ground::before {
@@ -44,21 +44,21 @@
   #core-sun {
     position: absolute; top: 50%; left: 50%; 
     transform: translate(-50%, -50%); /* 화면 완벽한 정중앙 */
-    width: 320px; height: 320px; border-radius: 50%;
+    width: 500px; height: 500px; border-radius: 50%;
     
     /* 관리자님이 올리신 태양 이미지의 검은 테두리/배경을 완벽하게 투명하게 만드는 마법의 속성 */
     mix-blend-mode: screen; 
     
-    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/600px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg') center/cover no-repeat;
+    background: url('assets/sun.png') center/cover no-repeat;
     
-    box-shadow: 0 0 100px #ffcc00, 0 0 250px rgba(251, 140, 0, 0.8); 
+    box-shadow: 0 0 150px rgba(255, 120, 0, 0.7), 0 0 350px rgba(255, 80, 0, 0.5); 
     animation: sunPulse 4s infinite alternate; 
     z-index: 100; /* 맨 위로 덮음 */
     pointer-events: none;
   }
   @keyframes sunPulse { 
-      0% { transform: translate(-50%, -50%) scale(0.98); box-shadow: 0 0 100px #ffcc00, 0 0 200px rgba(251, 140, 0, 0.6); } 
-      100% { transform: translate(-50%, -50%) scale(1.02); box-shadow: 0 0 150px #ffcc00, 0 0 350px rgba(251, 140, 0, 0.9); } 
+      0% { transform: translate(-50%, -50%) scale(0.98) rotate(0deg); box-shadow: 0 0 120px rgba(255, 120, 0, 0.7), 0 0 250px rgba(255, 80, 0, 0.5); } 
+      100% { transform: translate(-50%, -50%) scale(1.03) rotate(2deg); box-shadow: 0 0 200px rgba(255, 150, 0, 1), 0 0 450px rgba(255, 100, 0, 0.8); } 
   }
 
   #main-title {
@@ -90,11 +90,12 @@
   .wish-card {
     position: absolute; top: 50%; left: 50%; 
     width: 320px; height: 180px; margin-left: -160px; margin-top: -90px;
-    background: rgba(10, 25, 60, 0.85); border-radius: 30px; 
+    background: rgba(10, 15, 30, 0.6); border-radius: 30px; 
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     display: flex; align-items: center; justify-content: center; padding: 15px;
     transform-style: preserve-3d; pointer-events: none; transition: border-color 0.2s;
   }
-  .wish-card img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); z-index: 5; }
+  .wish-card img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); z-index: 5; }
   
   .speech-tail {
     position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
@@ -103,64 +104,69 @@
   .speech-tail-inner {
     position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%);
     border-left: 14px solid transparent; border-right: 14px solid transparent;
-    border-top: 14px solid rgba(10, 25, 60, 0.85); z-index: 3;
+    border-top: 14px solid transparent; z-index: 3;
   }
 
   /* 🚀 분리된 하단 우주선 추진체 */
   .drone-base {
-    position: absolute; bottom: -50px; 
+    position: absolute; bottom: -70px; 
     left: 50%; transform: translateX(-50%);
-    width: 130px; height: 25px; background: linear-gradient(to bottom, #cfd9df, #e2ebf0);
-    border: 2px solid #888; border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 5px 10px rgba(255,255,255,0.5);
-    display: flex; justify-content: space-between; align-items: center; padding: 0 18px; z-index: 4;
+    width: 160px; height: 90px;
+    background: url('assets/ship.png') center/contain no-repeat;
+    mix-blend-mode: screen;
+    display: flex; justify-content: space-between; align-items: center; padding: 0 35px; z-index: 4;
   }
   .drone-thruster {
-    width: 22px; height: 40px; border-radius: 50%; transform: translateY(18px);
-    animation: thrusterPulse 0.3s infinite alternate;
+    width: 20px; height: 35px; border-radius: 50%; transform: translateY(12px);
+    animation: thrusterPulse 0.15s infinite alternate;
   }
-  @keyframes thrusterPulse { 0% { transform: translateY(15px) scale(0.9); opacity: 0.8; } 100% { transform: translateY(22px) scale(1.1); opacity: 1; } }
+  @keyframes thrusterPulse { 0% { transform: translateY(10px) scale(0.9); opacity: 0.8; } 100% { transform: translateY(15px) scale(1.3); opacity: 1; } }
 
   body.admin-mode .wish-card { pointer-events: auto; cursor: pointer; border: 3px solid #ff4444 !important; }
   body.admin-mode .wish-card:hover { background: rgba(255, 0, 0, 0.4); }
 
   #open-btn {
-    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-    padding: 20px 70px; font-size: 40px; background: rgba(40, 40, 40, 0.8);
-    color: #fff; border: 3px solid #ffffff; border-radius: 60px;
+    position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+    padding: 24px 80px; font-size: 45px; background: rgba(20, 30, 50, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    color: #fff; border: 2px solid rgba(255,255,255,0.5); border-radius: 60px;
     cursor: pointer; z-index: 100; font-family: 'Black Han Sans', sans-serif;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); transition: all 0.2s;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(100, 200, 255, 0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  #open-btn:active { transform: translateX(-50%) scale(0.95); }
+  #open-btn:hover { transform: translateX(-50%) translateY(-5px) scale(1.05); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 45px rgba(100, 200, 255, 0.6); background: rgba(30, 40, 70, 0.8); }
+  #open-btn:active { transform: translateX(-50%) translateY(2px) scale(0.95); }
 
   #draw-ui {
     position: absolute; bottom: -900px; left: 50%; transform: translateX(-50%);
-    width: 950px; background: rgba(5, 15, 35, 0.98); border: 3px solid #ffffff;
-    border-radius: 30px 30px 0 0; box-shadow: 0 -20px 80px rgba(0, 0, 0, 0.8);
+    width: 950px; background: rgba(5, 10, 20, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.3); border-bottom: none;
+    border-radius: 30px 30px 0 0; box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.8), inset 0 2px 20px rgba(255,255,255,0.1);
     z-index: 200; display: flex; flex-direction: column; align-items: center;
-    padding: 30px 30px 40px; transition: bottom 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    padding: 35px 30px 45px; transition: bottom 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   #draw-ui.open { bottom: 0; }
 
-  #toolbar { width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; }
+  #toolbar { width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 10px; }
   .tool-group { display: flex; align-items: center; gap: 15px; }
-  .tool-title { color: #fff; font-family: 'Black Han Sans', sans-serif; font-size: 28px; margin-right: 10px; }
+  .tool-title { color: #fff; font-family: 'Black Han Sans', sans-serif; font-size: 28px; margin-right: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
   
-  .color-btn { width: 50px; height: 50px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-  .color-btn.active { transform: scale(1.2); border-color: #fff; box-shadow: 0 0 25px currentColor; }
+  .color-btn { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+  .color-btn.active { transform: scale(1.25); border-color: #fff; box-shadow: 0 0 25px currentColor, 0 0 10px currentColor inset; }
   
-  .size-btn { padding: 10px 20px; font-size: 26px; border: 2px solid #555; background: #222; color: #aaa; border-radius: 12px; font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: 0.2s; }
-  .size-btn.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 15px #fff; }
+  .size-btn { padding: 12px 24px; font-size: 26px; border: 1px solid rgba(255,255,255,0.3); background: rgba(30,30,40,0.6); color: #ccc; border-radius: 12px; font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px); }
+  .size-btn:hover { background: rgba(50,50,60,0.8); color: #fff; }
+  .size-btn.active { background: rgba(255,255,255,0.9); color: #000; border-color: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.6); }
 
-  #draw-canvas { background: rgba(0,0,0,0.5); border-radius: 16px; width: 800px; height: 450px; touch-action: none; cursor: crosshair; margin-bottom: 20px; border: 3px solid #ffffff; box-shadow: 0 0 30px rgba(255,255,255,0.3); transition: border-color 0.3s, box-shadow 0.3s; }
-  #warning-msg { color: #ff4444; font-size: 28px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; position: absolute; top: -40px; }
+  #draw-canvas { background: rgba(0,0,0,0.4); border-radius: 16px; width: 800px; height: 450px; touch-action: none; cursor: crosshair; margin-bottom: 25px; border: 2px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5); transition: border-color 0.3s, box-shadow 0.3s; }
+  #warning-msg { color: #ff5555; text-shadow: 0 0 10px #ff0000; font-size: 28px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; position: absolute; top: -45px; left: 50%; transform: translateX(-50%); width: 100%; text-align: center; }
   
   .btn-group { display: flex; gap: 30px; position: relative; }
-  .btn-group button { padding: 20px 50px; font-size: 35px; border: none; border-radius: 16px; font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: 0.1s; }
-  .btn-group button:active { transform: scale(0.95); }
-  #clear-btn { background: #444; color: #fff; }
-  #cancel-btn { background: #666; color: #fff; }
-  #submit-btn { background: #ffffff; color: #000; box-shadow: 0 0 30px rgba(255,255,255,0.5); transition: background 0.3s, box-shadow 0.3s; }
+  .btn-group button { padding: 20px 50px; font-size: 35px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(5px); }
+  .btn-group button:active { transform: scale(0.93) translateY(5px); }
+  #clear-btn { background: rgba(60, 60, 70, 0.8); color: #fff; }
+  #clear-btn:hover { background: rgba(80, 80, 90, 0.9); }
+  #cancel-btn { background: rgba(100, 100, 110, 0.8); color: #fff; }
+  #cancel-btn:hover { background: rgba(120, 120, 130, 0.9); }
+  #submit-btn { background: rgba(255, 255, 255, 0.9); color: #000; box-shadow: 0 0 30px rgba(255,255,255,0.6); }
 </style>
 </head>
 <body oncontextmenu="return false;">
@@ -259,6 +265,7 @@ let currentPenColor = '#ffffff'; let currentPenSize = 5.6;
 function updateContext() {
   ctx.strokeStyle = currentPenColor; ctx.lineWidth = currentPenSize; 
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.shadowBlur = 15; ctx.shadowColor = currentPenColor; // Neon glow effect
 }
 updateContext(); 
 
@@ -344,12 +351,12 @@ function launchNewWish(imgSrc, color) {
   card.style.border = `3px solid ${color}`; card.style.boxShadow = `0 0 30px ${color}80, inset 0 0 15px ${color}40`;
   
   card.innerHTML = `
-    <div class="speech-tail" style="border-top: 18px solid ${color};"></div>
-    <div class="speech-tail-inner"></div>
+    <div class="speech-tail" style="border-top: 18px solid ${color}; filter: brightness(1.2);"></div>
+    <div class="speech-tail-inner" style="border-top: 14px solid rgba(10, 15, 30, 0.6);"></div>
     <img src="${imgSrc}">
     <div class="drone-base">
-      <div class="drone-thruster" style="background: radial-gradient(ellipse, #ffffff 10%, ${color} 50%, transparent 80%);"></div>
-      <div class="drone-thruster" style="background: radial-gradient(ellipse, #ffffff 10%, ${color} 50%, transparent 80%);"></div>
+      <div class="drone-thruster" style="background: radial-gradient(circle, #fff 10%, ${color} 60%, transparent 100%); mix-blend-mode: screen; box-shadow: 0 0 15px ${color}"></div>
+      <div class="drone-thruster" style="background: radial-gradient(circle, #fff 10%, ${color} 60%, transparent 100%); mix-blend-mode: screen; box-shadow: 0 0 15px ${color}"></div>
     </div>
   `;
   scene.appendChild(card);

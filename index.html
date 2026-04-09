@@ -17,7 +17,7 @@
       padding: 0;
       width: 100vw;
       height: 100vh;
-      background: url('assets/bg.webp') center/cover no-repeat, radial-gradient(circle at 50% 50%, #050d21 0%, #010205 100%);
+      background: url('assets/museum.webp') center/cover no-repeat;
       overflow: hidden;
       font-family: 'Nanum Pen Script', cursive;
       user-select: none;
@@ -37,27 +37,8 @@
       pointer-events: none;
     }
 
-    /* 1️⃣ 레이어 맨 아래: 지표면 (z-index: 2) -> 천문과학관 이미지 적용 */
-    #earth-ground {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100vw;
-      height: 35vh;
-      background: url('assets/museum.webp') center top/cover no-repeat;
-      box-shadow: inset 0 50px 80px rgba(0, 0, 0, 0.8);
-      z-index: 2;
-    }
-
-    #earth-ground::before {
-      content: '';
-      position: absolute;
-      top: -100px;
-      left: 0;
-      width: 100%;
-      height: 100px;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-    }
+    /* 지표면 제거 - body 배경(museum)으로 통일 */
+    #earth-ground { display: none; }
 
     /* 2️⃣ 레이어 중간: 우주선 궤도 (z-index: 5) */
     #scene {
@@ -68,53 +49,29 @@
       transform: rotateX(-5deg);
     }
 
-    /* 3️⃣ 거대 태양 (가운데 배치, 완벽한 배경 제거된 CSS 애니메이션 태양) */
+    /* 3️⃣ 거대 태양 (가운데 배치, 직접 만든 은하 애니메이션) */
     #core-sun {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 250px;
-      height: 250px;
+      width: 400px;
+      height: 400px;
       transform: translate(-50%, -50%);
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffffff 0%, #ffdf00 30%, #ff4500 70%, transparent 100%);
-      box-shadow: 
-        0 0 80px 20px rgba(255, 69, 0, 0.8), 
-        0 0 150px 50px rgba(255, 215, 0, 0.6), 
-        0 0 300px 100px rgba(255, 140, 0, 0.4), 
-        inset 0 0 40px rgba(255, 255, 255, 0.8);
+      background: url('assets/anim_sun.webp') center/contain no-repeat;
+      mix-blend-mode: screen; /* 검정 배경 투명화 */
       animation: sunPulseCenter 4s infinite alternate;
       z-index: 1; /* 배경 은하수와 어우러짐 */
       pointer-events: none;
     }
 
-    #core-sun::after {
-      content: '';
-      position: absolute;
-      top: -30%;
-      left: -30%;
-      right: -30%;
-      bottom: -30%;
-      border-radius: 50%;
-      background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 150, 50, 0.4) 60deg, transparent 120deg, rgba(255, 200, 50, 0.4) 180deg, transparent 240deg, rgba(255, 100, 50, 0.4) 300deg, transparent 360deg);
-      animation: sunSpin 15s linear infinite;
-      mix-blend-mode: screen;
-      pointer-events: none;
-      filter: blur(15px);
-    }
-
-    @keyframes sunSpin {
-      100% { transform: rotate(360deg); }
-    }
-
     @keyframes sunPulseCenter {
       0% {
         transform: translate(-50%, -50%) scale(0.95);
-        filter: drop-shadow(0 0 30px rgba(255, 200, 0, 0.5));
+        filter: brightness(1) contrast(1.1);
       }
       100% {
         transform: translate(-50%, -50%) scale(1.05);
-        filter: drop-shadow(0 0 80px rgba(255, 200, 0, 0.9));
+        filter: brightness(1.3) contrast(1.2);
       }
     }
 
@@ -660,7 +617,7 @@
     <div class="speech-tail" style="border-top: 18px solid ${color}; filter: brightness(1.2);"></div>
     <div class="speech-tail-inner" style="border-top: 14px solid rgba(10, 15, 30, 0.6);"></div>
     <img src="${imgSrc}">
-    <div class="drone-base" style="background: url('assets/ship${shipId}.webp') center/contain no-repeat;">
+    <div class="drone-base" style="background: url('assets/ship${shipId}.png') center/contain no-repeat;">
       <div class="drone-thruster" style="background: radial-gradient(circle, #fff 10%, ${color} 60%, transparent 100%); mix-blend-mode: screen; box-shadow: 0 0 15px ${color}"></div>
       <div class="drone-thruster" style="background: radial-gradient(circle, #fff 10%, ${color} 60%, transparent 100%); mix-blend-mode: screen; box-shadow: 0 0 15px ${color}"></div>
     </div>

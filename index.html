@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>포천 아트밸리 소원 우주선 (V11 최종 레이어 및 태양 수정)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>포천 아트밸리 소원 우주선</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -19,95 +16,56 @@
       height: 100vh;
       background: url('assets/new_bg.webp') center/cover no-repeat;
       background-color: #050d21;
+      background-size: 110% 110%; /* 여백을 두고 동적 이동을 위해 조금 크게 설정 */
       overflow: hidden;
       font-family: 'Nanum Pen Script', cursive;
       user-select: none;
       touch-action: none;
       -webkit-touch-callout: none;
-      perspective: 1200px;
+      animation: bgPan 60s linear infinite alternate;
     }
 
-    body.admin-mode {
-      box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8);
+    /* 13. 배경 동적 애니메이션 */
+    @keyframes bgPan {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
     }
 
-    #stars-canvas {
-      display: none;
-    }
+    body.admin-mode { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8); }
 
-    /* 지표면 제거 - body 배경(museum)으로 통일 */
-    #earth-ground { display: none; }
-
-    /* 2️⃣ 레이어 중간: 우주선 궤도 (z-index: 5) */
     #scene {
       position: absolute;
       inset: 0;
       z-index: 5;
-      transform-style: preserve-3d;
-      transform: rotateX(-5deg);
     }
-
-    /* 태양 제거됨 */
-
-
 
     #main-title {
       position: absolute;
-      top: 40px;
-      left: 50px;
+      top: 30px;
+      left: 40px;
       z-index: 200;
       color: #fff;
       font-family: 'Black Han Sans', sans-serif;
-      font-size: 50px;
-      letter-spacing: 4px;
-      text-shadow: 0 0 25px rgba(255, 200, 100, 0.6);
+      font-size: 40px;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(255, 200, 100, 0.6);
     }
 
-    #fullscreen-btn {
+    #fullscreen-btn, #download-btn {
       position: absolute;
-      top: 30px;
-      right: 30px;
       z-index: 1000;
-      padding: 12px 24px;
-      background: rgba(50, 50, 50, 0.8);
+      padding: 10px 20px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       color: #fff;
       border-radius: 8px;
-      font-size: 20px;
+      font-size: 18px;
       font-family: 'Black Han Sans', sans-serif;
       cursor: pointer;
-      transition: 0.2s;
     }
-
-    #fullscreen-btn:hover {
-      background: rgba(80, 80, 80, 0.9);
-    }
-
-    #download-btn {
-      display: none;
-      position: absolute;
-      top: 30px;
-      left: 30px;
-      z-index: 1000;
-      padding: 12px 24px;
-      background: rgba(0, 150, 75, 0.8);
-      border: 2px solid rgba(0, 200, 100, 0.5);
-      color: #fff;
-      border-radius: 8px;
-      font-size: 20px;
-      font-family: 'Black Han Sans', sans-serif;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    #download-btn:hover {
-      background: rgba(0, 180, 90, 0.9);
-    }
-
-    body.admin-mode #download-btn {
-      display: block;
-    }
-
+    #fullscreen-btn { top: 25px; right: 25px; background: rgba(50, 50, 50, 0.8); }
+    #download-btn { top: 25px; left: 25px; background: rgba(0, 150, 75, 0.8); display: none; }
+    body.admin-mode #download-btn { display: block; }
+    
     #admin-secret-zone {
       position: absolute;
       top: 0;
@@ -117,527 +75,702 @@
       z-index: 1000;
     }
 
-    /* 💬 말풍선 소원 카드 */
+    /* 4. 소원 카드 체류 및 레이어 로직 */
     .wish-card {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 320px;
-      height: 180px;
-      margin-left: -160px;
-      margin-top: -90px;
-      background: rgba(10, 15, 30, 0.85); /* 블러 대신 반투명도 증가 시켜 성능 최적화 */
-      border-radius: 30px;
+      width: 280px;
+      height: 160px;
+      margin-left: -140px;
+      margin-top: -80px;
+      background: rgba(10, 15, 30, 0.85);
+      border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 15px;
-      transform-style: preserve-3d;
+      padding: 12px;
       pointer-events: none;
-      transition: border-color 0.2s;
+      /* 6. 레이어 동선: 날아가는 중 z-index 10, 도착 시 100 */
+      transition: left 2.5s cubic-bezier(0.25, 1, 0.5, 1), top 2.5s cubic-bezier(0.25, 1, 0.5, 1), transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s;
     }
-
-    .wish-card img {
-      max-width: 100%;
-      max-height: 100%;
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
-      z-index: 5;
-    }
-
-    .speech-tail {
-      position: absolute;
-      bottom: -18px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-left: 18px solid transparent;
-      border-right: 18px solid transparent;
-      z-index: 2;
-    }
-
-    .speech-tail-inner {
-      position: absolute;
-      bottom: -13px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-top: 14px solid transparent;
-      z-index: 3;
-    }
-
-    /* 🚀 분리된 하단 우주선 추진체 */
-    .drone-base {
-      position: absolute;
-      bottom: -70px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 160px;
-      height: 90px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 35px;
-      z-index: 4;
-    }
-
-    .drone-thruster {
-      width: 20px;
-      height: 35px;
-      border-radius: 50%;
-      transform: translateY(12px);
-      animation: thrusterPulse 0.15s infinite alternate;
-    }
-
-    @keyframes thrusterPulse {
-      0% {
-        transform: translateY(10px) scale(0.9);
-        opacity: 0.8;
-      }
-
-      100% {
-        transform: translateY(15px) scale(1.3);
-        opacity: 1;
-      }
-    }
-
+    
     body.admin-mode .wish-card {
       pointer-events: auto;
       cursor: pointer;
       border: 3px solid #ff4444 !important;
     }
 
-    body.admin-mode .wish-card:hover {
-      background: rgba(255, 0, 0, 0.4);
+    /* 도착 후 플로팅 효과 부여 CSS 클래스 */
+    .wish-card.floating {
+      animation: floatAnim 3s infinite ease-in-out;
+      z-index: 100; 
+    }
+    .wish-card.departing {
+      transform: translateY(-200vh) rotate(25deg);
+      opacity: 0;
+      transition: transform 2s ease-in, opacity 2s ease-in;
     }
 
-    #open-btn {
+    @keyframes floatAnim {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(2deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+
+    .wish-card img { max-width: 100%; max-height: 100%; z-index: 5; }
+
+    .speech-tail {
       position: absolute;
-      bottom: 50px;
+      bottom: -16px;
       left: 50%;
       transform: translateX(-50%);
-      padding: 24px 80px;
-      font-size: 45px;
-      background: rgba(20, 30, 50, 0.9); /* 성능 위해 블러 제거 */
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      z-index: 2;
+    }
+
+    .drone-base {
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+      z-index: 4;
+    }
+
+    .drone-thruster {
+      width: 18px;
+      height: 30px;
+      border-radius: 50%;
+      transform: translateY(10px);
+      animation: thrusterPulse 0.15s infinite alternate;
+    }
+
+    @keyframes thrusterPulse {
+      0% { transform: translateY(9px) scale(0.9); opacity: 0.8; }
+      100% { transform: translateY(13px) scale(1.3); opacity: 1; }
+    }
+
+    /* 7. 파티클 이펙트 */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      animation: particleFade 1.2s forwards ease-out;
+    }
+    @keyframes particleFade {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(3) translateY(30px); opacity: 0; }
+    }
+
+    /* 발사 버튼 */
+    #open-btn {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px 70px;
+      font-size: 40px;
+      background: rgba(20, 30, 50, 0.9);
       color: #fff;
       border: 2px solid rgba(255, 255, 255, 0.5);
       border-radius: 60px;
       cursor: pointer;
       z-index: 100;
       font-family: 'Black Han Sans', sans-serif;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(100, 200, 255, 0.4);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(100, 200, 255, 0.4);
+      transition: all 0.3s;
     }
+    #open-btn:hover { transform: translateX(-50%) translateY(-4px) scale(1.04); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(100, 200, 255, 0.6); }
 
-    #open-btn:hover {
-      transform: translateX(-50%) translateY(-5px) scale(1.05);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 45px rgba(100, 200, 255, 0.6);
-      background: rgba(30, 40, 70, 0.8);
-    }
-
-    #open-btn:active {
-      transform: translateX(-50%) translateY(2px) scale(0.95);
-    }
-
+    /* 3. 그리기 패널 (세로형 전시 키오스크 비율) */
     #draw-ui {
       position: absolute;
-      bottom: -900px;
+      bottom: -100vh;
       left: 50%;
       transform: translateX(-50%);
-      width: 950px;
-      background: rgba(5, 10, 20, 0.95); /* 블러 제거로 칠판(저사양) 환경 최적화 */
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      width: min(900px, 95vw);
+      height: 70vh; /* 비율 대폭 증가 */
+      background: rgba(5, 10, 20, 0.97);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-bottom: none;
-      border-radius: 30px 30px 0 0;
-      box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.8), inset 0 2px 20px rgba(255, 255, 255, 0.1);
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.8);
       z-index: 200;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 35px 30px 45px;
-      transition: bottom 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      padding: 20px;
+      transition: bottom 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      overflow: hidden;
     }
-
-    #draw-ui.open {
-      bottom: 0;
-    }
+    #draw-ui.open { bottom: 0; }
 
     #toolbar {
-      width: 800px;
+      width: 100%;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
-      margin-bottom: 25px;
-      padding: 0 10px;
+      margin-bottom: 12px;
+      gap: 20px;
+      flex-wrap: wrap;
     }
 
-    .tool-group {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .tool-title {
-      color: #fff;
-      font-family: 'Black Han Sans', sans-serif;
-      font-size: 28px;
-      margin-right: 15px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
+    .tool-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .tool-title { color: #fff; font-family: 'Black Han Sans', sans-serif; font-size: 18px; }
 
     .color-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.35); cursor: pointer; transition: transform 0.2s, border-color 0.2s;
     }
-
-    .color-btn.active {
-      transform: scale(1.25);
-      border-color: #fff;
-      box-shadow: 0 0 25px currentColor, 0 0 10px currentColor inset;
-    }
+    .color-btn.active { transform: scale(1.3); border-color: #fff; }
 
     .size-btn {
-      padding: 12px 24px;
-      font-size: 26px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(30, 30, 40, 0.6);
-      color: #ccc;
-      border-radius: 12px;
-      font-family: 'Black Han Sans', sans-serif;
-      cursor: pointer;
-      transition: all 0.3s;
+      padding: 8px 16px; font-size: 18px; border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(30, 30, 40, 0.7); color: #ccc; border-radius: 8px;
+      font-family: 'Black Han Sans', sans-serif; cursor: pointer;
     }
+    .size-btn.active { background: rgba(255, 255, 255, 0.9); color: #000; border-color: #fff; }
 
-    .size-btn:hover {
-      background: rgba(50, 50, 60, 0.8);
-      color: #fff;
+    #main-draw-area {
+      display: flex; flex-direction: row; width: 100%; flex: 1 1 auto; gap: 16px; margin-bottom: 16px; min-height: 0;
     }
-
-    .size-btn.active {
-      background: rgba(255, 255, 255, 0.9);
-      color: #000;
-      border-color: #fff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-    }
-
     #draw-canvas {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 16px;
-      width: 800px;
-      height: 450px;
-      touch-action: none;
-      cursor: crosshair;
-      margin-bottom: 25px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.5);
-      transition: border-color 0.3s, box-shadow 0.3s;
+      background: rgba(0, 0, 0, 0.5); border-radius: 12px; flex: 1 1 0; min-width: 0; min-height: 200px;
+      touch-action: none; cursor: crosshair; border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    #right-sidebar {
+      width: 260px; flex-shrink: 0; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px;
+      display: flex; flex-direction: column; overflow-y: auto;
+    }
+
+    #sticker-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;
+    }
+    .sticker-btn {
+      font-size: 26px; width: 100%; height: 46px; background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.15s; line-height: 1;
+    }
+    .sticker-btn.active { background: rgba(255, 220, 80, 0.4); border-color: #ffd700; transform: scale(1.15); }
+    
+    .ssize-btn {
+      padding: 8px 0; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(30, 30, 40, 0.7); color: #ccc; border-radius: 6px;
+      font-family: 'Black Han Sans', sans-serif; cursor: pointer; flex: 1; text-align: center;
+    }
+    .ssize-btn.active { background: rgba(255, 255, 255, 0.9); color: #000; }
+
+    .erase-tool-btn {
+      padding: 12px; font-size: 18px; border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(30, 30, 40, 0.7); color: #fff; border-radius: 8px;
+      font-family: 'Black Han Sans', sans-serif; cursor: pointer; flex: 1; text-align: center;
+    }
+    #eraser-btn.active { background: rgba(255, 200, 100, 0.9); color: #000; border-color: #ffc864; }
+
+    @media (max-width: 768px) {
+      #main-draw-area { flex-direction: column; }
+      #right-sidebar { width: 100%; flex: 0 0 auto; display: block; }
+      #sticker-grid { grid-template-columns: repeat(8, 1fr); }
     }
 
     #warning-msg {
-      color: #ff5555;
-      text-shadow: 0 0 10px #ff0000;
-      font-size: 28px;
-      margin-bottom: 10px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      position: absolute;
-      top: -45px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      text-align: center;
+      color: #ff5555; font-size: 20px; opacity: 0; transition: opacity 0.3s;
+      position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+      white-space: nowrap; font-family: 'Black Han Sans', sans-serif;
     }
 
-    .btn-group {
-      display: flex;
-      gap: 30px;
-      position: relative;
+    .bottom-actions { display: flex; gap: 16px; position: relative; flex-shrink: 0; }
+    .bottom-actions button {
+      padding: 15px 35px; font-size: 26px; border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px; font-family: 'Black Han Sans', sans-serif; cursor: pointer;
     }
+    #undo-btn { background: rgba(40, 100, 160, 0.8); color: #fff; }
+    #cancel-btn { background: rgba(100, 100, 110, 0.8); color: #fff; }
+    #submit-btn { background: rgba(255, 255, 255, 0.9); color: #000; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); font-size: 30px;}
 
-    .btn-group button {
-      padding: 20px 50px;
-      font-size: 35px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      font-family: 'Black Han Sans', sans-serif;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-group button:active {
-      transform: scale(0.93) translateY(5px);
-    }
-
-    #clear-btn {
-      background: rgba(60, 60, 70, 0.8);
-      color: #fff;
-    }
-
-    #clear-btn:hover {
-      background: rgba(80, 80, 90, 0.9);
-    }
-
-    #cancel-btn {
-      background: rgba(100, 100, 110, 0.8);
-      color: #fff;
-    }
-
-    #cancel-btn:hover {
-      background: rgba(120, 120, 130, 0.9);
-    }
-
-    #submit-btn {
-      background: rgba(255, 255, 255, 0.9);
-      color: #000;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+    /* 9. 펜 직관성 커서 마커 */
+    #cursor-marker {
+      position: absolute; pointer-events: none; border-radius: 50%; opacity: 0;
+      z-index: 10000; transform: translate(-50%, -50%); transition: width 0.1s, height 0.1s, background-color 0.1s;
+      border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none;
     }
   </style>
 </head>
-
 <body oncontextmenu="return false;">
-
-  <canvas id="stars-canvas"></canvas>
-
   <div id="earth-ground"></div>
   <div id="scene"></div>
 
-  <button id="download-btn">💾 원본 HTML 다운로드</button>
+  <button id="download-btn">💾 원본 다운로드</button>
 
   <div id="main-title">포천 아트밸리 소원 우주선</div>
   <button id="fullscreen-btn">🖥️ 전체화면 시작</button>
   <button id="open-btn">소원 적어 보내기! 🚀</button>
-
   <div id="admin-secret-zone"></div>
+  
+  <div id="cursor-marker"></div>
 
   <div id="draw-ui">
     <div id="toolbar">
       <div class="tool-group">
         <span class="tool-title">빛깔</span>
-        <button class="color-btn active" style="background:#ffffff; color:#ffffff;" data-color="#ffffff"></button>
-        <button class="color-btn" style="background:#ff00ea; color:#ff00ea;" data-color="#ff00ea"></button>
-        <button class="color-btn" style="background:#00d2ff; color:#00d2ff;" data-color="#00d2ff"></button>
-        <button class="color-btn" style="background:#39ff14; color:#39ff14;" data-color="#39ff14"></button>
-        <button class="color-btn" style="background:#ffeb3b; color:#ffeb3b;" data-color="#ffeb3b"></button>
+        <button class="color-btn active" style="background:#ffffff" data-color="#ffffff"></button>
+        <button class="color-btn" style="background:#ff00ea" data-color="#ff00ea"></button>
+        <button class="color-btn" style="background:#00d2ff" data-color="#00d2ff"></button>
+        <button class="color-btn" style="background:#39ff14" data-color="#39ff14"></button>
+        <button class="color-btn" style="background:#ffeb3b" data-color="#ffeb3b"></button>
+        <button class="color-btn" style="background:#ff6b35" data-color="#ff6b35"></button>
       </div>
-      <div class="tool-group">
-        <span class="tool-title">굵기</span>
-        <button class="size-btn" data-size="2.4">얇게</button>
-        <button class="size-btn active" data-size="5.6">보통</button>
-        <button class="size-btn" data-size="11.2">굵게</button>
+      <div class="tool-group" style="margin-left: auto;">
+        <span class="tool-title">글자 굵기</span>
+        <button class="size-btn" data-size="1.8">얇게</button>
+        <button class="size-btn active" data-size="4.0">보통</button>
+        <button class="size-btn" data-size="8.0">굵게</button>
       </div>
     </div>
 
-    <canvas id="draw-canvas" width="800" height="450"></canvas>
+    <div id="main-draw-area">
+      <canvas id="draw-canvas"></canvas>
 
-    <div class="btn-group">
+      <div id="right-sidebar">
+        <span class="tool-title" style="display:block; margin-bottom:8px;">스티커 크기</span>
+        <div style="display:flex; gap:6px; margin-bottom:12px;">
+          <button class="ssize-btn" data-ssize="30">소</button>
+          <button class="ssize-btn active" data-ssize="50">중</button>
+          <button class="ssize-btn" data-ssize="80">대</button>
+        </div>
+
+        <!-- 1. 스티커 개수 절반으로 축소 (우주/밤하늘 전용) -->
+        <div id="sticker-grid">
+          <button class="sticker-btn" data-emoji="⭐">⭐</button>
+          <button class="sticker-btn" data-emoji="🌙">🌙</button>
+          <button class="sticker-btn" data-emoji="🚀">🚀</button>
+          <button class="sticker-btn" data-emoji="🪐">🪐</button>
+          <button class="sticker-btn" data-emoji="🛸">🛸</button>
+          <button class="sticker-btn" data-emoji="🌍">🌍</button>
+          <button class="sticker-btn" data-emoji="🛰️">🛰️</button>
+          <button class="sticker-btn" data-emoji="✨">✨</button>
+        </div>
+
+        <hr style="width:100%; border:0; border-top:1px solid rgba(255,255,255,0.2); margin:12px 0;">
+
+        <span class="tool-title" style="display:block; margin-bottom:8px;">지우기 도구</span>
+        <div style="display:flex; gap:8px;">
+          <button id="eraser-btn" class="erase-tool-btn">🧹 지우개</button>
+          <button id="clear-btn" class="erase-tool-btn" style="background: rgba(255, 100, 100, 0.4);">🗑️ 모두 싹</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-actions">
       <div id="warning-msg">소원을 먼저 그려야 우주로 보낼 수 있습니다!</div>
-      <button id="clear-btn">지우기</button>
+      <!-- 11. Undo 뒤로가기 버튼 -->
+      <button id="undo-btn">↩️ 되돌리기</button>
       <button id="cancel-btn">접기</button>
       <button id="submit-btn">우주로 발사 ✨</button>
     </div>
   </div>
 
   <script>
+    // -----------------------------------------
+    // 1. 유틸 UI 로직
+    // -----------------------------------------
     document.getElementById('download-btn').addEventListener('click', () => {
       const clone = document.documentElement.cloneNode(true);
-      const sceneClone = clone.querySelector('#scene');
-      sceneClone.querySelectorAll('.wish-card').forEach(c => c.remove());
+      clone.querySelector('#scene').innerHTML = '';
       clone.querySelector('body').classList.remove('admin-mode');
-      clone.querySelector('#fullscreen-btn').style.display = '';
       clone.querySelector('#draw-ui').classList.remove('open');
-      clone.querySelector('#open-btn').style.transform = '';
-      const htmlContent = "<!DOCTYPE html>\n<html lang=\"ko\">\n" + clone.innerHTML + "\n</html>";
-      const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'artvalley_wish_spacecraft.html';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      const blob = new Blob(['<!DOCTYPE html>\n<html lang="ko">\n' + clone.innerHTML + '\n</html>'], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'artvalley_bg_spaceships.html';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
     });
 
     const fsBtn = document.getElementById('fullscreen-btn');
     fsBtn.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().then(() => { fsBtn.style.display = 'none'; }).catch(e => alert(e));
+      if (!document.fullscreenElement)
+        document.documentElement.requestFullscreen().then(() => fsBtn.style.display = 'none').catch(e => alert(e));
+    });
+
+    // -----------------------------------------
+    // 2. 그리기 캔버스 및 마커 로직
+    // -----------------------------------------
+    const canvas = document.getElementById('draw-canvas');
+    const ctx = canvas.getContext('2d');
+    const cursorMarker = document.getElementById('cursor-marker');
+    let isDrawing = false, hasDrawn = false;
+    let penColor = '#ffffff', penSize = 4.0;
+    let eraserMode = false, stickerMode = false, currentSticker = '', stickerSize = 50;
+    
+    // 11. 실행취소(Undo) 로직용 배열
+    let drawHistory = [];
+
+    function saveHistory() {
+      if(drawHistory.length > 20) drawHistory.shift();
+      drawHistory.push(canvas.toDataURL());
+    }
+    
+    document.getElementById('undo-btn').addEventListener('click', () => {
+      resetIdleTimer();
+      if(drawHistory.length > 0) {
+        const img = new Image();
+        img.src = drawHistory.pop();
+        img.onload = () => {
+          ctx.clearRect(0,0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+        };
+      } else {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        hasDrawn = false;
       }
     });
 
-    // CPU 점유율을 대폭 낮추기 위해 별 캔버스 애니메이션 삭제 (이미지에 원래 별이 있음)
-    // drawStars(); 이 부분은 성능을 위해 비활성화 처리됨
-
-    const canvas = document.getElementById('draw-canvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false; let hasDrawn = false;
-    let currentPenColor = '#ffffff'; let currentPenSize = 5.6;
-
-    function updateContext() {
-      ctx.strokeStyle = currentPenColor; ctx.lineWidth = currentPenSize;
-      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.shadowBlur = 15; ctx.shadowColor = currentPenColor; // Neon glow effect
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const W = Math.round(rect.width), H = Math.round(rect.height);
+      if (canvas.width !== W || canvas.height !== H) {
+        const tmpData = canvas.toDataURL();
+        canvas.width = W; canvas.height = H;
+        const img = new Image();
+        img.onload = () => { ctx.drawImage(img, 0, 0); applyCtxStyle(); };
+        img.src = tmpData;
+      }
     }
-    updateContext();
+
+    function applyCtxStyle() {
+      ctx.strokeStyle = eraserMode ? 'rgba(0,0,0,1)' : penColor;
+      ctx.lineWidth = eraserMode ? penSize * 5 : penSize * 1.5;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
+      ctx.shadowBlur = eraserMode ? 0 : 5;
+      ctx.shadowColor = penColor;
+      
+      // 9. 마커 스타일 업데이트
+      if(!stickerMode) {
+        cursorMarker.style.width = (ctx.lineWidth) + 'px';
+        cursorMarker.style.height = (ctx.lineWidth) + 'px';
+        cursorMarker.style.backgroundColor = eraserMode ? 'rgba(255,255,255,0.7)' : penColor;
+      }
+    }
 
     document.querySelectorAll('.color-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-        currentPenColor = btn.dataset.color; updateContext();
-        canvas.style.borderColor = currentPenColor; canvas.style.boxShadow = `0 0 30px ${currentPenColor}80`;
-        document.getElementById('submit-btn').style.background = currentPenColor; document.getElementById('submit-btn').style.boxShadow = `0 0 30px ${currentPenColor}80`;
-        document.getElementById('draw-ui').style.borderColor = currentPenColor;
+        penColor = btn.dataset.color;
+        
+        eraserMode = false; stickerMode = false; cursorMarker.style.display = 'block';
+        document.getElementById('eraser-btn').classList.remove('active');
+        document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('active'));
+
+        canvas.className = ''; applyCtxStyle();
+        document.getElementById('submit-btn').style.background = penColor;
+        document.getElementById('draw-ui').style.borderColor = penColor;
       });
     });
+
     document.querySelectorAll('.size-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-        currentPenSize = parseFloat(btn.dataset.size); updateContext();
+        penSize = parseFloat(btn.dataset.size);
+        applyCtxStyle();
+      });
+    });
+
+    const eraserBtn = document.getElementById('eraser-btn');
+    eraserBtn.addEventListener('click', () => {
+      eraserMode = !eraserMode; stickerMode = false;
+      document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('active'));
+      eraserBtn.classList.toggle('active', eraserMode);
+      canvas.className = eraserMode ? 'eraser-mode' : '';
+      applyCtxStyle();
+      cursorMarker.style.display = 'block';
+    });
+
+    document.querySelectorAll('.ssize-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ssize-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+        stickerSize = parseInt(btn.dataset.ssize);
+      });
+    });
+
+    document.querySelectorAll('.sticker-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const same = stickerMode && currentSticker === btn.dataset.emoji;
+        document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('active'));
+        eraserMode = false; eraserBtn.classList.remove('active');
+
+        if (same) {
+          stickerMode = false; canvas.className = ''; cursorMarker.style.display = 'block';
+        } else {
+          stickerMode = true; currentSticker = btn.dataset.emoji;
+          btn.classList.add('active'); canvas.className = 'sticker-mode'; cursorMarker.style.display = 'none';
+        }
+        applyCtxStyle();
       });
     });
 
     function getPos(e) {
-      const rect = canvas.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
+      const r = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (cx - r.left) * (canvas.width / r.width), y: (cy - r.top) * (canvas.height / r.height), cx, cy };
     }
-    function startDraw(e) { e.preventDefault(); isDrawing = true; resetIdleTimer(); ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }
-    function doDraw(e) { e.preventDefault(); if (!isDrawing) return; resetIdleTimer(); hasDrawn = true; ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); document.getElementById('warning-msg').style.opacity = '0'; }
+    
+    document.addEventListener('mousemove', (e) => {
+      if(stickerMode) return;
+      cursorMarker.style.left = e.clientX + 'px'; cursorMarker.style.top = e.clientY + 'px';
+    });
+    document.addEventListener('touchmove', (e) => {
+      if(stickerMode) return;
+      if(e.touches) { cursorMarker.style.left = e.touches[0].clientX + 'px'; cursorMarker.style.top = e.touches[0].clientY + 'px'; }
+    });
+    
+    canvas.addEventListener('mouseenter', () => { if(!stickerMode) { cursorMarker.style.opacity = '1'; cursorMarker.style.display = 'block'; }applyCtxStyle(); });
+    canvas.addEventListener('mouseleave', () => cursorMarker.style.opacity = '0');
+
+    function placeSticker(e) {
+      saveHistory(); // Save before drawing
+      const p = getPos(e);
+      ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+      ctx.font = stickerSize + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(currentSticker, p.x, p.y);
+      ctx.restore();
+      hasDrawn = true; document.getElementById('warning-msg').style.opacity = '0';
+      
+      // 2. 스티커 1회용 토글 로직
+      stickerMode = false; 
+      document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('active'));
+      canvas.className = '';
+      cursorMarker.style.display = 'block';
+      cursorMarker.style.opacity = '1';
+      applyCtxStyle();
+    }
+
+    function startDraw(e) {
+      if(e.type === 'touchstart') e.preventDefault(); 
+      resetIdleTimer();
+      if (stickerMode) { placeSticker(e); return; }
+      saveHistory(); // Save before drawing line
+      isDrawing = true; applyCtxStyle();
+      const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+      cursorMarker.style.opacity = '1';
+    }
+    
+    function doDraw(e) {
+      if(e.type === 'touchmove') e.preventDefault();
+      if (stickerMode || !isDrawing) return;
+      resetIdleTimer(); hasDrawn = true;
+      const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+      document.getElementById('warning-msg').style.opacity = '0';
+    }
     function endDraw() { isDrawing = false; }
+
     canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', doDraw); window.addEventListener('mouseup', endDraw);
     canvas.addEventListener('touchstart', startDraw, { passive: false }); canvas.addEventListener('touchmove', doDraw, { passive: false }); window.addEventListener('touchend', endDraw);
-    document.getElementById('clear-btn').addEventListener('click', () => { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawn = false; resetIdleTimer(); });
 
-    const drawUI = document.getElementById('draw-ui'); const openBtn = document.getElementById('open-btn'); let idleTimer;
-    function closeDrawUI() { drawUI.classList.remove('open'); openBtn.style.transform = 'translateX(-50%)'; clearTimeout(idleTimer); }
-    function resetIdleTimer() { clearTimeout(idleTimer); if (drawUI.classList.contains('open')) { idleTimer = setTimeout(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawn = false; closeDrawUI(); }, 30000); } }
-    openBtn.addEventListener('click', () => { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawn = false; document.getElementById('warning-msg').style.opacity = '0'; drawUI.classList.add('open'); openBtn.style.transform = 'translate(-50%, 200px)'; resetIdleTimer(); });
-    document.getElementById('cancel-btn').addEventListener('click', closeDrawUI);
-
-    const scene = document.getElementById('scene');
-    const MAX_ORBITS = 12;
-
-    let ORBIT_RADIUS_X = window.innerWidth * 0.38;
-    let ORBIT_RADIUS_Z = window.innerWidth * 0.2;
-    let ORBIT_Y_OFFSET = 0; // 태양이 정중앙에 있으므로, 궤도 중심도 정중앙(0)으로 수정
-
-    window.addEventListener('resize', () => {
-      ORBIT_RADIUS_X = window.innerWidth * 0.38;
-      ORBIT_RADIUS_Z = window.innerWidth * 0.2;
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      saveHistory();
+      ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawn = false; resetIdleTimer();
     });
 
-    let slots = new Array(MAX_ORBITS).fill(null); let allWishes = []; let launchQueue = []; let isLaunching = false;
+    // 10. 자동 초기화 로직
+    const drawUI = document.getElementById('draw-ui');
+    const openBtn = document.getElementById('open-btn');
+    let idleTimer;
+
+    function closeDrawUI() { drawUI.classList.remove('open'); openBtn.style.transform = 'translateX(-50%)'; clearTimeout(idleTimer); cursorMarker.style.opacity = '0'; }
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      // 30초 무반응 시 초기화
+      if (drawUI.classList.contains('open')) idleTimer = setTimeout(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); drawHistory = []; hasDrawn = false; closeDrawUI(); }, 30000);
+    }
+
+    openBtn.addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); drawHistory = []; hasDrawn = false;
+      document.getElementById('warning-msg').style.opacity = '0'; drawUI.classList.add('open'); openBtn.style.transform = 'translate(-50%, 300px)';
+      resetIdleTimer();
+      requestAnimationFrame(() => requestAnimationFrame(resizeCanvas));
+    });
+    document.getElementById('cancel-btn').addEventListener('click', closeDrawUI);
+    window.addEventListener('resize', () => { if (drawUI.classList.contains('open')) resizeCanvas(); updateGridDimensions(); });
+
+
+    // -----------------------------------------
+    // 3. 우주선 체류/배치/저장 알고리즘 (5. 6. 7. 8. 12. 14 반영)
+    // -----------------------------------------
+    const scene = document.getElementById('scene');
+    let allWishes = []; 
+    // 로컬 스토리지에 저장해서 세로고침 보호
+    const STORAGE_KEY = 'artvalley_wishes';
+
+    // 5. 그리드 시스템
+    let COLS = 5, ROWS = 3, MAX_WISHES = COLS * ROWS;
+    let cellWidth, cellHeight;
+    let grids = [];
+
+    function updateGridDimensions() {
+      cellWidth = window.innerWidth / COLS;
+      cellHeight = (window.innerHeight * 0.9) / ROWS; // 상단 조금 여유
+    }
+    
+    function initGrids() {
+      updateGridDimensions();
+      grids = Array.from({length: MAX_WISHES}, (_, i) => ({
+        id: i,
+        occupied: false,
+        cx: (i % COLS) * cellWidth + cellWidth / 2,
+        cy: (Math.floor(i / COLS)) * cellHeight + cellHeight / 2
+      }));
+    }
+    initGrids();
+    
+    function saveToLocalStorage() {
+      const data = allWishes.map(w => ({ img: w.imgSrc, color: w.color, gridId: w.gridId, shipId: w.shipId }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+    
+    function loadFromLocalStorage() {
+      const svd = localStorage.getItem(STORAGE_KEY);
+      if(!svd) return;
+      try {
+        const data = JSON.parse(svd);
+        data.forEach(d => {
+          if(d.gridId >= 0 && d.gridId < MAX_WISHES) {
+            grids[d.gridId].occupied = true;
+            createWishElement(d, d.gridId, true); // 바로 배치 (애니메이션 안함)
+          }
+        });
+      } catch(e) {}
+    }
 
     document.getElementById('submit-btn').addEventListener('click', () => {
       if (!hasDrawn) { document.getElementById('warning-msg').style.opacity = '1'; return; }
-      const dataURL = canvas.toDataURL('image/webp', 0.8); closeDrawUI();
-      launchQueue.push({ img: dataURL, color: currentPenColor }); processQueue();
+      const dataURL = canvas.toDataURL('image/webp', 0.6); // 사이즈 압축
+      closeDrawUI();
+      launchNewWish(dataURL, penColor);
     });
 
-    function processQueue() {
-      if (launchQueue.length === 0 || isLaunching) return;
-      isLaunching = true; const nextWishData = launchQueue.shift(); launchNewWish(nextWishData.img, nextWishData.color);
-      setTimeout(() => { isLaunching = false; processQueue(); }, 3500);
-    }
-
-    function getOrbit3DPosition(slotIndex, currentAngle) {
-      const tiltLimit = 15 * (Math.PI / 180);
-      const tiltX = -tiltLimit + (tiltLimit * 2 * (slotIndex / (MAX_ORBITS - 1)));
-      const panY = slotIndex * 137.5 * (Math.PI / 180);
-
-      const x0 = ORBIT_RADIUS_X * Math.cos(currentAngle);
-      const z0 = ORBIT_RADIUS_Z * Math.sin(currentAngle);
-
-      const y1 = z0 * Math.sin(tiltX);
-      const z1 = z0 * Math.cos(tiltX);
-
-      const x2 = x0 * Math.cos(panY) + z1 * Math.sin(panY);
-      const z2 = -x0 * Math.sin(panY) + z1 * Math.cos(panY);
-
-      return { x: x2, y: y1 + ORBIT_Y_OFFSET, z: z2 };
-    }
-    function lerp(start, end, t) { return start * (1 - t) + end * t; }
-
+    // 신규 소원 발사
     function launchNewWish(imgSrc, color) {
-      const card = document.createElement('div'); card.className = 'wish-card';
-      card.style.border = `3px solid ${color}`; card.style.boxShadow = `0 0 30px ${color}80, inset 0 0 15px ${color}40`;
+      updateGridDimensions(); // 좌표 최신화
       
-      const shipId = Math.floor(Math.random() * 3) + 1;
-
+      // 8. 오래된 소원 퇴장 (공간 없으면 가장 먼저 만들어진 애 날려보냄)
+      const emptyGrids = grids.filter(g => !g.occupied);
+      let targetGrid;
+      
+      if(emptyGrids.length === 0) {
+        const oldest = allWishes[0]; // 큐의 맨앞
+        if(oldest) {
+          oldest.el.classList.add('departing');
+          grids[oldest.gridId].occupied = false;
+          allWishes.shift(); // 돔에서 즉시 제거하지 않고 클래스에 맡기고 배열에서만 제거 
+          setTimeout(() => { try { oldest.el.remove(); } catch(e){} }, 2000);
+        }
+        // 이제 빈공간 1개 생김
+        targetGrid = grids[oldest.gridId];
+      } else {
+        // 빈 공간 중에 5. 랜덤 선정 (순차적 배치 금지)
+        targetGrid = emptyGrids[Math.floor(Math.random() * emptyGrids.length)];
+      }
+      
+      targetGrid.occupied = true;
+      const dataInfo = { img: imgSrc, color: color, shipId: (Math.floor(Math.random() * 3) + 1) };
+      createWishElement(dataInfo, targetGrid.id, false);
+    }
+    
+    function createWishElement(data, gridId, immediate) {
+      const card = document.createElement('div');
+      card.className = 'wish-card';
+      card.style.border = `3px solid ${data.color}`;
+      card.style.boxShadow = `0 0 25px ${data.color}80`;
+      
+      // 마스코트 적용 
       card.innerHTML = `
-    <div class="speech-tail" style="border-top: 18px solid ${color}; filter: brightness(1.2);"></div>
-    <div class="speech-tail-inner" style="border-top: 14px solid rgba(10, 15, 30, 0.6);"></div>
-    <img src="${imgSrc}">
-    <div class="drone-base" style="background: url('assets/ship${shipId}_bg.png') center/contain no-repeat;">
-      <div class="drone-thruster" style="background: radial-gradient(circle, #fff 10%, ${color} 60%, transparent 100%); mix-blend-mode: screen; box-shadow: 0 0 15px ${color}"></div>
-      <div class="drone-thruster" style="background: radial-gradient(circle, #fff 10%, ${color} 60%, transparent 100%); mix-blend-mode: screen; box-shadow: 0 0 15px ${color}"></div>
-    </div>
-  `;
+        <div class="speech-tail" style="border-top:16px solid ${data.color};"></div>
+        <img src="${data.img}">
+        <div class="drone-base" style="background:url('assets/ship${data.shipId}_bg.png') center/contain no-repeat;">
+          <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
+          <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
+        </div>`;
       scene.appendChild(card);
-      const newWish = { el: card, createdAt: Date.now(), state: 'launch', slotIndex: -1, orbitAngle: Math.random() * Math.PI * 2, speed: 0.002 + Math.random() * 0.001, curX: 0, curY: 800, curZ: 0, departVx: 0, departVy: 0, departVz: 0 };
+      
+      // 현재 그리드 센터 죄표 갱신
+      grids[gridId].cx = (gridId % COLS) * cellWidth + cellWidth / 2;
+      grids[gridId].cy = (Math.floor(gridId / COLS)) * cellHeight + cellHeight / 2;
+      
+      // 약간의 랜덤 흩어짐
+      const finalX = grids[gridId].cx + (Math.random() * 40 - 20);
+      const finalY = grids[gridId].cy + (Math.random() * 40 - 20) + 50;
 
-      card.addEventListener('click', () => { if (isAdminMode) { card.remove(); slots[newWish.slotIndex] = null; allWishes = allWishes.filter(w => w !== newWish); } });
-
-      let emptySlot = slots.findIndex(s => s === null);
-      if (emptySlot !== -1) { newWish.slotIndex = emptySlot; slots[emptySlot] = newWish; }
-      else {
-        let oldestIndex = 0; let oldestAge = 0;
-        slots.forEach((wish, idx) => { if (wish && Date.now() - wish.createdAt > oldestAge) { oldestAge = Date.now() - wish.createdAt; oldestIndex = idx; } });
-        if (slots[oldestIndex]) { 
-          let dw = slots[oldestIndex]; dw.state = 'depart'; 
-          let sX = window.innerWidth * 0.45; let sY = -window.innerHeight * 0.45; let sZ = 150;
-          let dx = sX - dw.curX; let dy = sY - dw.curY; let dz = sZ - dw.curZ;
-          let dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
-          dw.departVx = (dx / dist) * 12; dw.departVy = (dy / dist) * 12; dw.departVz = (dz / dist) * 12; 
-          dw.speedAcc = 1.05; 
+      const wishObj = { el: card, createdAt: Date.now(), gridId: gridId, imgSrc: data.img, color: data.color, shipId: data.shipId };
+      allWishes.push(wishObj);
+      saveToLocalStorage(); // 저장 
+      
+      // 관리자 강제삭제 핸들러
+      card.addEventListener('click', () => {
+        if (isAdminMode) { 
+          card.remove(); grids[gridId].occupied = false; 
+          allWishes = allWishes.filter(w => w !== wishObj); 
+          saveToLocalStorage();
         }
-        newWish.slotIndex = oldestIndex; slots[oldestIndex] = newWish;
+      });
+
+      if(immediate) {
+        card.style.left = finalX + 'px';  
+        card.style.top = finalY + 'px';
+        card.classList.add('floating');
+      } else {
+        // 비행 모드 (발사 레이어 동선 제어)
+        card.style.zIndex = 10;
+        card.style.left = (window.innerWidth / 2) + 'px';
+        card.style.top = (window.innerHeight + 200) + 'px'; // 화면 아래 중앙
+        card.style.transform = 'scale(0.3)';
+
+        // 7. 파티클 궤적 효과 생성 (날아가는 도중)
+        const pInterval = setInterval(() => {
+          const r = card.getBoundingClientRect();
+          const p = document.createElement('div'); p.className = 'particle';
+          p.style.width = (Math.random() * 10 + 5) + 'px'; p.style.height = p.style.width;
+          p.style.background = data.color; p.style.boxShadow = `0 0 10px ${data.color}`;
+          p.style.left = (r.left + r.width/2 + (Math.random()*40-20)) + 'px';
+          p.style.top = (r.top + r.height + (Math.random()*20)) + 'px';
+          scene.appendChild(p);
+          setTimeout(() => p.remove(), 1200);
+        }, 120);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            card.style.left = finalX + 'px';
+            card.style.top = finalY + 'px';
+            card.style.transform = 'scale(1)';
+            setTimeout(() => {
+              clearInterval(pInterval); // 파티클 중지
+              card.classList.add('floating'); // 최상단 Z-index 및 둥둥
+            }, 2500);
+          });
+        });
       }
-      allWishes.push(newWish);
     }
 
-    function animateUniverse() {
-      const now = Date.now();
-      for (let i = allWishes.length - 1; i >= 0; i--) {
-        let wish = allWishes[i]; let age = now - wish.createdAt;
+    // 초기화 과정
+    loadFromLocalStorage();
 
-        if (age < 1500 && wish.state !== 'depart') {
-          let t = age / 1500; let ease = 1 - Math.pow(1 - t, 3);
-          wish.curX = lerp(0, 0, ease); wish.curY = lerp(800, ORBIT_Y_OFFSET, ease); wish.curZ = lerp(0, 200, ease);
-          wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1.2)`;
-        } else if (age >= 1500 && age < 3500 && wish.state !== 'depart') {
-          wish.curX = Math.sin(age * 0.002) * 10; wish.curY = Math.cos(age * 0.0015) * 10 + ORBIT_Y_OFFSET; wish.curZ = 200;
-          wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1.2)`;
-        } else if (age >= 3500 && age < 6500 && wish.state !== 'depart') {
-          let t = (age - 3500) / 3000; let ease = t * t * (3 - 2 * t);
-          wish.orbitAngle += wish.speed; let target = getOrbit3DPosition(wish.slotIndex, wish.orbitAngle);
-          wish.curX = lerp(wish.curX, target.x, ease); wish.curY = lerp(wish.curY, target.y, ease); wish.curZ = lerp(wish.curZ, target.z, ease);
-          wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(${lerp(1.2, 1, ease)})`;
-        } else if (age >= 6500 && wish.state !== 'depart') {
-          wish.orbitAngle += wish.speed; let pos = getOrbit3DPosition(wish.slotIndex, wish.orbitAngle);
-          wish.curX = pos.x; wish.curY = pos.y; wish.curZ = pos.z;
-          wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(1)`;
-        } else if (wish.state === 'depart') {
-          if(wish.speedAcc) { wish.departVx *= wish.speedAcc; wish.departVy *= wish.speedAcc; wish.departVz *= wish.speedAcc; }
-          wish.curX += wish.departVx; wish.curY += wish.departVy; wish.curZ += wish.departVz;
-          let opacity = parseFloat(wish.el.style.opacity || 1) - 0.012;
-          wish.el.style.transform = `translate3d(${wish.curX}px, ${wish.curY}px, ${wish.curZ}px) scale(0.5) rotate(15deg)`;
-          wish.el.style.opacity = opacity;
-          if (opacity <= 0 || wish.curX > window.innerWidth || wish.curY < -window.innerHeight) { wish.el.remove(); allWishes.splice(i, 1); }
-        }
-      }
-      requestAnimationFrame(animateUniverse);
-    }
-    animateUniverse();
-
-    let adminClicks = 0; let adminTimer; let isAdminMode = false;
+    // 14. 관리자 모드 (안전하게 유지보수)
+    let adminClicks = 0, adminTimer, isAdminMode = false;
     document.getElementById('admin-secret-zone').addEventListener('click', () => {
-      adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 2000);
+      adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => adminClicks = 0, 2000);
       if (adminClicks >= 5) {
         isAdminMode = !isAdminMode; adminClicks = 0;
-        if (isAdminMode) { document.body.classList.add('admin-mode'); alert("⚠️ [관리자 모드 켜짐]\n좌측 상단에서 원본 HTML을 다운로드하거나, 삭제할 소원을 터치하세요."); }
-        else { document.body.classList.remove('admin-mode'); alert("✅ [관리자 모드 꺼짐]"); }
+        document.body.classList.toggle('admin-mode', isAdminMode);
+        alert(isAdminMode ? '⚠️ [관리자 모드 켜짐]\n다운로드하거나 소원 카드를 터치해 안전하게 삭제하세요.' : '✅ [관리자 모드 꺼짐]');
       }
     });
   </script>
 </body>
-
 </html>

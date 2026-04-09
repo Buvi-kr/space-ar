@@ -68,28 +68,53 @@
       transform: rotateX(-5deg);
     }
 
-    /* 3️⃣ 거대 태양 (우상단 배치 및 완벽한 경계선 제거) */
+    /* 3️⃣ 거대 태양 (가운데 배치, 완벽한 배경 제거된 CSS 애니메이션 태양) */
     #core-sun {
       position: absolute;
-      top: -150px;
-      right: -150px;
-      width: 700px;
-      height: 700px;
-      mix-blend-mode: screen; /* 검은 배경 완전 제거, 빛만 스며듦 */
-      background: url('assets/sun.webp') center/contain no-repeat;
-      animation: sunPulse 4s infinite alternate;
-      z-index: 100;
+      top: 50%;
+      left: 50%;
+      width: 250px;
+      height: 250px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 0%, #ffdf00 30%, #ff4500 70%, transparent 100%);
+      box-shadow: 
+        0 0 80px 20px rgba(255, 69, 0, 0.8), 
+        0 0 150px 50px rgba(255, 215, 0, 0.6), 
+        0 0 300px 100px rgba(255, 140, 0, 0.4), 
+        inset 0 0 40px rgba(255, 255, 255, 0.8);
+      animation: sunPulseCenter 4s infinite alternate;
+      z-index: 1; /* 배경 은하수와 어우러짐 */
       pointer-events: none;
     }
 
-    @keyframes sunPulse {
+    #core-sun::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      left: -30%;
+      right: -30%;
+      bottom: -30%;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 150, 50, 0.4) 60deg, transparent 120deg, rgba(255, 200, 50, 0.4) 180deg, transparent 240deg, rgba(255, 100, 50, 0.4) 300deg, transparent 360deg);
+      animation: sunSpin 15s linear infinite;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      filter: blur(15px);
+    }
+
+    @keyframes sunSpin {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes sunPulseCenter {
       0% {
-        transform: scale(0.98) rotate(0deg);
-        filter: brightness(1) contrast(1.1);
+        transform: translate(-50%, -50%) scale(0.95);
+        filter: drop-shadow(0 0 30px rgba(255, 200, 0, 0.5));
       }
       100% {
-        transform: scale(1.05) rotate(2deg);
-        filter: brightness(1.3) contrast(1.2);
+        transform: translate(-50%, -50%) scale(1.05);
+        filter: drop-shadow(0 0 80px rgba(255, 200, 0, 0.9));
       }
     }
 

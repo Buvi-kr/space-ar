@@ -640,37 +640,12 @@
     const STORAGE_KEY = 'artvalley_wishes';
 
     // 5. 그리드 시스템
-    let COLS = 5, ROWS = 3, MAX_WISHES = COLS * ROWS;
-    let cellWidth, cellHeight;
-    let grids = [];
-
-    function updateGridDimensions() {
-      cellWidth = window.innerWidth / COLS;
-      cellHeight = (window.innerHeight * 0.9) / ROWS; // 상단 조금 여유
-    }
+    const MAX_WISHES = 12;
+    const colorPalette = ["#ff00ea", "#00d2ff", "#39ff14", "#ffeb3b", "#ff6b35", "#b15cff", "#ff5c8d", "#5cffda"];
     
-    
-    function initGrids() {
-      updateGridDimensions();
-      grids = Array.from({length: MAX_WISHES}, (_, i) => {
-        let isBlocked = false;
-        // Block Center (Row 1, Col 2) -> Index 7
-        // Block Bottom Center (Row 2, Col 2) -> Index 12
-        if (i === 7 || i === 12) isBlocked = true;
-        
-        return {
-          id: i,
-          occupied: isBlocked, // Permanently mark as occupied so emptyGrids ignores it
-          blocked: isBlocked,
-          cx: (i % COLS) * cellWidth + cellWidth / 2,
-          cy: (Math.floor(i / COLS)) * cellHeight + cellHeight / 2
-        };
-      });
-    }
-    initGrids();
     
     function saveToLocalStorage() {
-      const data = allWishes.map(w => ({ img: w.imgSrc, color: w.color, gridId: w.gridId, shipId: w.shipId }));
+      const data = allWishes.map(w => ({ img: w.imgSrc, color: w.color, finalX: w.finalX, finalY: w.finalY, shipId: w.shipId }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
     
@@ -680,13 +655,12 @@
       try {
         const data = JSON.parse(svd);
         data.forEach(d => {
-          if(d.gridId >= 0 && d.gridId < MAX_WISHES) {
-            grids[d.gridId].occupied = true;
-            createWishElement(d, d.gridId, true); // 바로 배치 (애니메이션 안함)
-          }
+          createWishElement(d, d.finalX, d.finalY, true); // 바로 배치
         });
       } catch(e) {}
     }
+
+
 
     
     // 1. Auto Crop Canvas Function
@@ -741,46 +715,65 @@
       if (!hasDrawn) { document.getElementById('warning-msg').style.opacity = '1'; return; }
       const dataURL = cropCanvas(canvas, 30); // 1. Auto Crop Applied
       closeDrawUI();
-      launchNewWish(dataURL, penColor);
+      launchNewWish(dataURL);
     });
 
+    
     // 신규 소원 발사
-    function launchNewWish(imgSrc, color) {
-      updateGridDimensions(); // 좌표 최신화
+    function launchNewWish(imgSrc) {
+      const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
       
-      // 8. 오래된 소원 퇴장 (공간 없으면 가장 먼저 만들어진 애 날려보냄)
-      const emptyGrids = grids.filter(g => !g.occupied);
-      let targetGrid;
+      let valid = false, fx = 0, fy = 0;
+      let wW = window.innerWidth, wH = window.innerHeight;
       
-      if(emptyGrids.length === 0) {
-        const oldest = allWishes[0]; // 큐의 맨앞
-        if(oldest) {
-          oldest.el.classList.add('departing');
-          grids[oldest.gridId].occupied = false;
-          allWishes.shift(); // 돔에서 즉시 제거하지 않고 클래스에 맡기고 배열에서만 제거 
-          setTimeout(() => { try { oldest.el.remove(); } catch(e){} }, 2000);
+      for(let i=0; i<100; i++) {
+        // 화면 가장자리 여백 확보
+        fx = 150 + Math.random() * (wW - 300);
+        fy = 100 + Math.random() * (wH - 250);
+        
+        let cx = wW / 2, cy = wH / 2;
+        
+        // 중앙 포토타임 존 회피
+        if(Math.abs(fx - cx) < 350 && Math.abs(fy - cy) < 250) continue;
+        // 하단 UI 버튼 영역 회피
+        if(fy > wH - 200 && Math.abs(fx - cx) < 400) continue;
+        
+        // 겹침 체크
+        let overlap = false;
+        for(let w of allWishes) {
+          if(!w.el.classList.contains('departing') && Math.abs(fx - w.finalX) < 280 && Math.abs(fy - w.finalY) < 180) {
+            overlap = true; break;
+          }
         }
-        // 이제 빈공간 1개 생김
-        targetGrid = grids[oldest.gridId];
-      } else {
-        // 빈 공간 중에 5. 랜덤 선정 (순차적 배치 금지)
-        targetGrid = emptyGrids[Math.floor(Math.random() * emptyGrids.length)];
+        if(!overlap) { valid = true; break; }
       }
       
-      targetGrid.occupied = true;
-      const dataInfo = { img: imgSrc, color: color, shipId: (Math.floor(Math.random() * 3) + 1) };
-      createWishElement(dataInfo, targetGrid.id, false);
+      if(!valid || allWishes.length >= MAX_WISHES) {
+        // 자리 없거나 최대 개수 초과 시 가장 오래된 것 삭제 (퇴장 애니메이션)
+        const oldest = allWishes[0];
+        if(oldest) {
+          oldest.el.classList.add('departing');
+          allWishes.shift();
+          setTimeout(() => { try { oldest.el.remove(); } catch(e){} }, 2000);
+        }
+        // 삭제 후 자리 확보 없이 그냥 마지막에 구한 좌표(무작위 중복)에 발사
+      }
+      
+      const dataInfo = { img: imgSrc, color: randomColor, shipId: (Math.floor(Math.random() * 3) + 1) };
+      createWishElement(dataInfo, fx, fy, false);
     }
     
-    function createWishElement(data, gridId, immediate) {
+    function createWishElement(data, finalX, finalY, immediate) {
       const card = document.createElement('div');
       card.className = 'wish-card';
       card.style.border = `3px solid ${data.color}`;
       card.style.boxShadow = `0 0 25px ${data.color}80`;
+      // 말풍선의 전체 배경을 반투명 랜덤 색상으로 부여
+      card.style.backgroundColor = data.color + '40'; // 25% opacity hex
+      card.style.backdropFilter = 'blur(4px)'; // 살짝 블러
+      card.style.webkitBackdropFilter = 'blur(4px)';
       
-      // 마스코트 적용 
-      
-        card.innerHTML = `
+      card.innerHTML = `
         <div class="speech-tail" style="border-top:16px solid ${data.color};"></div>
         <img src="${data.img}" style="pointer-events: auto;">
         <div class="drone-base" style="background:url('assets/ship${data.shipId}_bg.png') center/contain no-repeat;">
@@ -790,73 +783,55 @@
       
       scene.appendChild(card);
       
-      // 현재 그리드 센터 죄표 갱신
-      grids[gridId].cx = (gridId % COLS) * cellWidth + cellWidth / 2;
-      grids[gridId].cy = (Math.floor(gridId / COLS)) * cellHeight + cellHeight / 2;
-      
-      // 약간의 랜덤 흩어짐
-      const finalX = grids[gridId].cx + (Math.random() * 40 - 20);
-      const finalY = grids[gridId].cy + (Math.random() * 40 - 20) + 50;
-
-      const wishObj = { el: card, createdAt: Date.now(), gridId: gridId, imgSrc: data.img, color: data.color, shipId: data.shipId };
+      const wishObj = { el: card, createdAt: Date.now(), finalX: finalX, finalY: finalY, imgSrc: data.img, color: data.color, shipId: data.shipId };
       allWishes.push(wishObj);
-      saveToLocalStorage(); // 저장 
+      saveToLocalStorage();
       
-      // 관리자 강제삭제 핸들러
-      
-      
-      // 관리자 강제삭제 핸들러 & 포토타임 토글
+      // 관리자 핸들러 & 포토타임
       let isPhotoTime = false;
       let originalLeft, originalTop, originalTransform;
       card.addEventListener('click', () => {
         if (isAdminMode) { 
           card.remove(); 
-          if (!grids[gridId].blocked) grids[gridId].occupied = false; 
           allWishes = allWishes.filter(w => w !== wishObj); 
           saveToLocalStorage();
         } else {
-          // 4. 포토타임 로직
           const fxLayer = document.getElementById('phototime-fx');
           isPhotoTime = !isPhotoTime;
           if (isPhotoTime) {
             originalLeft = card.style.left;
             originalTop = card.style.top;
             originalTransform = card.style.transform;
-            
             card.classList.add('phototime');
             card.classList.remove('floating');
-            fxLayer.classList.add('active'); // 스포트라이트 ON
+            fxLayer.classList.add('active'); 
             
             setTimeout(() => {
               if(isPhotoTime && document.body.contains(card)) {
                 isPhotoTime = false;
                 card.classList.remove('phototime');
                 card.classList.add('floating');
-                fxLayer.classList.remove('active'); // 스포트라이트 OFF
+                fxLayer.classList.remove('active');
               }
             }, 5000);
           } else {
             card.classList.remove('phototime');
             card.classList.add('floating');
-            fxLayer.classList.remove('active'); // 스포트라이트 OFF
+            fxLayer.classList.remove('active');
           }
         }
       });
-
-
 
       if(immediate) {
         card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';  
         card.style.top = finalY + 'px';
         card.classList.add('floating');
       } else {
-        // 비행 모드 (발사 레이어 동선 제어)
         card.style.zIndex = 10;
         card.style.left = (window.innerWidth / 2) + 'px';
-        card.style.top = (window.innerHeight + 200) + 'px'; // 화면 아래 중앙
-        card.style.transform = 'scale(0.3)';
+        card.style.top = (window.innerHeight + 200) + 'px'; 
+        card.style.transform = 'translate(-50%, -50%) scale(0.3)';
 
-        // 7. 파티클 궤적 효과 생성 (날아가는 도중)
         const pInterval = setInterval(() => {
           const r = card.getBoundingClientRect();
           const p = document.createElement('div'); p.className = 'particle';
@@ -870,17 +845,18 @@
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';
+            card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%) scale(1)';
             card.style.top = finalY + 'px';
-            card.style.transform = 'scale(1)';
             setTimeout(() => {
-              clearInterval(pInterval); // 파티클 중지
-              card.classList.add('floating'); // 최상단 Z-index 및 둥둥
+              clearInterval(pInterval);
+              card.style.transform = 'translate(-50%, -50%)';
+              card.classList.add('floating'); 
             }, 2500);
           });
         });
       }
     }
+
 
     // 초기화 과정
     loadFromLocalStorage();

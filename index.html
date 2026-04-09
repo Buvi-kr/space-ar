@@ -78,19 +78,17 @@
     /* 4. 소원 카드 체류 및 레이어 로직 */
     .wish-card {
       position: absolute;
-      width: 280px;
-      height: 160px;
-      margin-left: -140px;
-      margin-top: -80px;
+      /* No fixed width/height for dynamic sizing */
       background: rgba(10, 15, 30, 0.85);
       border-radius: 24px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 12px;
+      padding: 15px;
       pointer-events: none;
-      /* 6. 레이어 동선: 날아가는 중 z-index 10, 도착 시 100 */
       transition: left 2.5s cubic-bezier(0.25, 1, 0.5, 1), top 2.5s cubic-bezier(0.25, 1, 0.5, 1), transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s;
+      transform-origin: center;
     }
     
     body.admin-mode .wish-card {
@@ -130,15 +128,15 @@
 
     .drone-base {
       position: absolute;
-      bottom: -60px;
+      bottom: -40%;
       left: 50%;
       transform: translateX(-50%);
-      width: 140px;
-      height: 80px;
+      width: 80%; /* proportional */
+      height: 60px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 30px;
+      padding: 0 10%;
       z-index: 4;
     }
 
@@ -191,11 +189,11 @@
     /* 3. 그리기 패널 (세로형 전시 키오스크 비율) */
     #draw-ui {
       position: absolute;
-      bottom: -100vh;
+      bottom: -600px;
       left: 50%;
       transform: translateX(-50%);
-      width: min(900px, 95vw);
-      height: 70vh; /* 비율 대폭 증가 */
+      width: 1000px;
+      height: 520px;
       background: rgba(5, 10, 20, 0.97);
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-bottom: none;
@@ -302,7 +300,15 @@
       z-index: 10000; transform: translate(-50%, -50%); transition: width 0.1s, height 0.1s, background-color 0.1s;
       border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none;
     }
-  </style>
+  
+    .wish-card.phototime {
+      z-index: 9999 !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) scale(2) !important;
+      transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    </style>
 </head>
 <body oncontextmenu="return false;">
   <div id="earth-ground"></div>
@@ -649,9 +655,58 @@
       } catch(e) {}
     }
 
+    
+    // 1. Auto Crop Canvas Function
+    function cropCanvas(sourceCanvas, padding = 30) {
+      const ctx = sourceCanvas.getContext('2d');
+      const w = sourceCanvas.width;
+      const h = sourceCanvas.height;
+      const data = ctx.getImageData(0, 0, w, h).data;
+      
+      let minX = w, minY = h, maxX = 0, maxY = 0;
+      let drawn = false;
+      
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const alpha = data[(y * w + x) * 4 + 3];
+          if (alpha > 0) {
+            drawn = true;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      
+      if (!drawn) return sourceCanvas.toDataURL('image/webp', 0.6); // Empty
+      
+      // Apply Padding
+      minX = Math.max(0, minX - padding);
+      minY = Math.max(0, minY - padding);
+      maxX = Math.min(w, maxX + padding);
+      maxY = Math.min(h, maxY + padding);
+      
+      const width = maxX - minX;
+      const height = maxY - minY;
+      
+      const cropCanvas = document.createElement('canvas');
+      cropCanvas.width = width;
+      cropCanvas.height = height;
+      const cropCtx = cropCanvas.getContext('2d');
+      
+      cropCtx.drawImage(
+        sourceCanvas,
+        minX, minY, width, height,
+        0, 0, width, height
+      );
+      
+      return cropCanvas.toDataURL('image/webp', 0.8);
+    }
+
     document.getElementById('submit-btn').addEventListener('click', () => {
       if (!hasDrawn) { document.getElementById('warning-msg').style.opacity = '1'; return; }
-      const dataURL = canvas.toDataURL('image/webp', 0.6); // 사이즈 압축
+      const dataURL = cropCanvas(canvas, 30); // 1. Auto Crop Applied
       closeDrawUI();
       launchNewWish(dataURL, penColor);
     });
@@ -691,13 +746,15 @@
       card.style.boxShadow = `0 0 25px ${data.color}80`;
       
       // 마스코트 적용 
-      card.innerHTML = `
+      
+        card.innerHTML = `
         <div class="speech-tail" style="border-top:16px solid ${data.color};"></div>
-        <img src="${data.img}">
+        <img src="${data.img}" style="pointer-events: auto;">
         <div class="drone-base" style="background:url('assets/ship${data.shipId}_bg.png') center/contain no-repeat;">
           <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
           <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
         </div>`;
+      
       scene.appendChild(card);
       
       // 현재 그리드 센터 죄표 갱신
@@ -713,16 +770,45 @@
       saveToLocalStorage(); // 저장 
       
       // 관리자 강제삭제 핸들러
+      
+      // 관리자 강제삭제 핸들러 & 포토타임 토글
+      let isPhotoTime = false;
+      let originalLeft, originalTop, originalTransform;
       card.addEventListener('click', () => {
         if (isAdminMode) { 
           card.remove(); grids[gridId].occupied = false; 
           allWishes = allWishes.filter(w => w !== wishObj); 
           saveToLocalStorage();
+        } else {
+          // 4. 포토타임 로직
+          isPhotoTime = !isPhotoTime;
+          if (isPhotoTime) {
+            originalLeft = card.style.left;
+            originalTop = card.style.top;
+            originalTransform = card.style.transform;
+            
+            // Centering logic via class
+            card.classList.add('phototime');
+            card.classList.remove('floating');
+            
+            // Auto return after 5 seconds
+            setTimeout(() => {
+              if(isPhotoTime && document.body.contains(card)) {
+                isPhotoTime = false;
+                card.classList.remove('phototime');
+                card.classList.add('floating');
+              }
+            }, 5000);
+          } else {
+            card.classList.remove('phototime');
+            card.classList.add('floating');
+          }
         }
       });
 
+
       if(immediate) {
-        card.style.left = finalX + 'px';  
+        card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';  
         card.style.top = finalY + 'px';
         card.classList.add('floating');
       } else {
@@ -746,7 +832,7 @@
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            card.style.left = finalX + 'px';
+            card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';
             card.style.top = finalY + 'px';
             card.style.transform = 'scale(1)';
             setTimeout(() => {

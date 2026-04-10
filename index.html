@@ -860,12 +860,11 @@
       MAX_WISHES: 16,
       GRID_COLS: 4,
       GRID_ROWS: 4,
-      REPULSION_R: 270,   // min comfortable distance between centers (px)
-      REPULSION_K: 9000,  // repulsion force constant
+      REPULSION_K: 0.04,  // AABB repulsion force multiplier (lower = softer push)
       DRAG_PUSH_R: 360,   // drag-chain reaction radius
       DRAG_PUSH_K: 0.55,  // drag push impulse multiplier
-      SPRING_K: 0.038, // spring-to-target stiffness
-      DAMPING: 0.80,  // velocity damping per frame
+      SPRING_K: 0.015,     // spring-to-target stiffness (lower = slower flight)
+      DAMPING: 0.82,  // velocity damping per frame
       FLOAT_AMP: 9,     // floating amplitude (px)
       FLOAT_SPEED: 0.018, // floating oscillation speed
       BOUNDARY_TOP: 110,
@@ -946,18 +945,30 @@
         w.vx += (w.targetX - w.x) * PHYSICS.SPRING_K * dt;
         w.vy += (w.targetY - w.y) * PHYSICS.SPRING_K * dt;
 
-        /* Repulsion from other cards */
+        /* Repulsion from other cards (말풍선+본체 덩어리 직사각형 AABB 충돌) */
         for (let j = 0; j < allWishes.length; j++) {
           if (i === j || allWishes[j].departing) continue;
           const o = allWishes[j];
-          const rdx = w.x - o.x, rdy = w.y - o.y;
-          const d2 = rdx * rdx + rdy * rdy;
-          const minD = PHYSICS.REPULSION_R;
-          if (d2 < minD * minD && d2 > 0.01) {
-            const d = Math.sqrt(d2);
-            const force = (PHYSICS.REPULSION_K / (d2)) * dt;
-            w.vx += (rdx / d) * force;
-            w.vy += (rdy / d) * force;
+          const dx = w.x - o.x;
+          const dy = w.y - o.y;
+          
+          const absDx = Math.abs(dx);
+          const absDy = Math.abs(dy);
+          
+          // 전체 덩어리가 겹치지 않게 하는 직육면체 허용 영역
+          const minDx = 270;
+          const minDy = 350;
+          
+          if (absDx < minDx && absDy < minDy) {
+            const overlapX = minDx - absDx;
+            const overlapY = minDy - absDy;
+            
+            // 더 가까운 축 방향으로 밀어내기
+            if (overlapX < overlapY) {
+               w.vx += overlapX * PHYSICS.REPULSION_K * dt * Math.sign(dx || 1);
+            } else {
+               w.vy += overlapY * PHYSICS.REPULSION_K * dt * Math.sign(dy || 1);
+            }
           }
         }
 
@@ -1094,11 +1105,10 @@
       w.phototime = true;
       card.style.zIndex = '9999';
       card.style.transform = 'translate(-50%,-50%) scale(2)';
-      fxLayer.classList.add('active');
-
+      // 빛나는 효과(fxLayer) 활성화 취소
+      
       setTimeout(() => {
         if (!document.body.contains(card)) return;
-        fxLayer.classList.remove('active');
         w.phototime = false;
         w.x = window.innerWidth / 2;
         w.y = window.innerHeight / 2;
@@ -1108,7 +1118,7 @@
         card.style.transform = 'translate(-50%,-50%)';
       }, 5000);
 
-      /* ── Click: toggle photo-time spotlight ── */
+      /* ── Click: toggle photo-time ── */
       card.addEventListener('click', e => {
         if (isAdminMode) {
           allWishes = allWishes.filter(x => x !== w);
@@ -1119,12 +1129,10 @@
         w.phototime = !w.phototime;
         if (w.phototime) {
           card.classList.add('phototime');
-          fxLayer.classList.add('active');
           setTimeout(() => {
             if (w.phototime) {
               w.phototime = false;
               card.classList.remove('phototime');
-              fxLayer.classList.remove('active');
               /* Restore position to physics */
               w.x = finalX; w.y = finalY;
               card.style.zIndex = '10';
@@ -1132,7 +1140,6 @@
           }, 5000);
         } else {
           card.classList.remove('phototime');
-          fxLayer.classList.remove('active');
           w.x = parseFloat(card.style.left) || finalX;
           w.y = parseFloat(card.style.top) || finalY;
           card.style.zIndex = '10';

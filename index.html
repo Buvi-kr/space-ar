@@ -878,7 +878,7 @@
     let allWishes = [];    // physics objects
     let rafId = null;
     let lastTs = 0;
-    const STORAGE_KEY = 'artvalley_wishes_v2';
+    // LocalStorage 사용 취소 (새로고침 시 완전 리셋)
 
     /* ── Bottom safe zone (above launch button) ── */
     function bottomSafe() { return window.innerHeight - Math.max(200, window.innerHeight * 0.22); }
@@ -1007,18 +1007,11 @@
        6. WISH CARD CREATION & LAUNCH
        ============================================================ */
     function saveToLS() {
-      try {
-        const data = allWishes.map(w => ({ img: w.imgSrc, color: w.color, shipId: w.shipId, tx: w.targetX, ty: w.targetY }));
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch (e) { }
+      // 로컬 스토리지 저장 기능 제거 (더미 데이터 방지)
     }
 
     function loadFromLS() {
-      try {
-        const svd = localStorage.getItem(STORAGE_KEY);
-        if (!svd) return;
-        JSON.parse(svd).forEach(d => spawnCard(d, d.tx, d.ty, true));
-      } catch (e) { }
+      // 로컬 스토리지 불러오기 기능 제거
     }
 
     /* ── Auto-crop → launch ── */
@@ -1219,7 +1212,7 @@
     /* ============================================================
        8. INIT
        ============================================================ */
-    loadFromLS();
+    // loadFromLS(); // 더 이상 호출하지 않음
 
     /* ── Admin mode ── */
     let adminClicks = 0, adminTimer, isAdminMode = false;

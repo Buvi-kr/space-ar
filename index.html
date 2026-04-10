@@ -120,6 +120,7 @@
       pointer-events: none;
       transition: left 2.5s cubic-bezier(0.25, 1, 0.5, 1), top 2.5s cubic-bezier(0.25, 1, 0.5, 1), transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s;
       transform-origin: center;
+      will-change: transform, left, top; /* 최적화 */
     }
 
     body.admin-mode .wish-card {
@@ -530,6 +531,7 @@
         radial-gradient(circle at 50% 50%, rgba(255, 255, 230, 0.5) 0%, rgba(255, 220, 100, 0.2) 20%, transparent 60%),
         conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 255, 255, 0.3) 45deg, transparent 90deg, rgba(255, 255, 255, 0.3) 135deg, transparent 180deg, rgba(255, 255, 255, 0.3) 225deg, transparent 270deg, rgba(255, 255, 255, 0.3) 315deg, transparent 360deg);
       mix-blend-mode: screen;
+      will-change: opacity, transform; /* 최적화 */
     }
 
     #phototime-fx.active {
@@ -943,38 +945,21 @@
       let valid = false, fx = 0, fy = 0;
       let wW = window.innerWidth, wH = window.innerHeight;
 
-      // 구름 군락(Cloud Cluster) 노드들 정의 (해상도에 맞춰 동적 계산)
-      const cloudNodes = [
-        { cx: wW * 0.2, cy: wH * 0.3 }, // 좌상단
-        { cx: wW * 0.2, cy: wH * 0.7 }, // 좌하단
-        { cx: wW * 0.8, cy: wH * 0.3 }, // 우상단
-        { cx: wW * 0.8, cy: wH * 0.7 }  // 우하단
-      ];
+      // 캔버스 전체 기반 무작위 흩뿌림 (중앙 빔 현상 제거)
+      for (let i = 0; i < 500; i++) {
+        // 전체 화면의 랜덤한 위치 할당 (가장자리 여백 고려)
+        fx = Math.random() * (wW - 360) + 180;
+        fy = Math.random() * (wH - 400) + 150;
 
-      // 구름 기반 무작위 흩뿌림
-      for (let i = 0; i < 150; i++) {
-        // 랜덤 구름 노드 선택
-        const node = cloudNodes[Math.floor(Math.random() * cloudNodes.length)];
+        let cx = wW / 2;
 
-        // 반경 내 랜덤 지터(떨림)
-        fx = node.cx + (Math.random() * (wW * 0.25) - (wW * 0.125));
-        fy = node.cy + (Math.random() * (wH * 0.3) - (wH * 0.15));
-
-        let cx = wW / 2, cy = wH / 2;
-
-        // 화면 가장자리 여백 확보 (우주선이 밖으로 나가는 것 방지)
-        if (fx < 180 || fx > wW - 180) continue;
-        if (fy < 150 || fy > wH - 250) continue;
-
-        // 중앙 포토타임 존 절대 침범 금지
-        if (Math.abs(fx - cx) < 350 && Math.abs(fy - cy) < 250) continue;
-        // 하단 소원 버튼 영역 절대 침범 금지
+        // 하단 소원 버튼 영역 절대 침범 금지 (이 외 중앙 등 모든 곳 배치 허용)
         if (fy > wH - Math.max(250, wH * 0.2) && Math.abs(fx - cx) < 400) continue;
 
-        // 우주선끼리 겹침 방지 (비례 커진 우주선 크기를 반영한 계산)
+        // 우주선끼리 겹침 절대 방지
         let overlap = false;
         for (let w of allWishes) {
-          if (!w.el.classList.contains('departing') && Math.abs(fx - w.finalX) < 260 && Math.abs(fy - w.finalY) < 220) {
+          if (!w.el.classList.contains('departing') && Math.abs(fx - w.finalX) < 280 && Math.abs(fy - w.finalY) < 250) {
             overlap = true; break;
           }
         }
@@ -1004,10 +989,9 @@
       const card = document.createElement('div');
       card.className = 'wish-card';
       card.style.border = `3px solid ${data.color}`;
-      card.style.boxShadow = `0 0 25px ${data.color}80`;
-      card.style.backgroundColor = data.color + '40';
-      card.style.backdropFilter = 'blur(4px)';
-      card.style.webkitBackdropFilter = 'blur(4px)';
+      card.style.boxShadow = `0 0 10px ${data.color}80`; /* 2GB RAM 칠판 렉 완화를 위해 그림자 축소 */
+      /* 블러(backdrop-filter)는 전자칠판에서 엄청난 렉을 유발하므로 과감히 제거, 대신 불투명하게 */
+      card.style.backgroundColor = 'rgba(10, 15, 30, 0.95)';
       card.style.cursor = 'pointer'; // 드래그/클릭 유도
 
       card.innerHTML = `
@@ -1066,37 +1050,44 @@
       window.addEventListener('mouseup', () => { if (isDragging && !isPhotoTime) { isDragging = false; } });
       window.addEventListener('touchend', () => { if (isDragging && !isPhotoTime) { isDragging = false; } });
 
+      // 처음 생성 시 트랜지션 없애기 (우주선이 갑자기 날아오는 현상 방지)
+      card.style.transition = 'none';
+
       if (immediate) {
         card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';
         card.style.top = finalY + 'px';
         card.classList.add('floating');
+        scene.appendChild(card);
       } else {
-        card.style.zIndex = 10;
+        // 최초 발사: 무조건 중앙 맨 위 포토 존 배치 (트랜지션 없이 즉각 배치)
+        card.style.zIndex = 9999;
         card.style.left = (window.innerWidth / 2) + 'px';
-        card.style.top = (window.innerHeight + 200) + 'px';
-        card.style.transform = 'translate(-50%, -50%) scale(0.3)';
+        card.style.top = (window.innerHeight / 2) + 'px';
+        card.style.transform = 'translate(-50%, -50%) scale(1.6)';
+        scene.appendChild(card);
 
-        const pInterval = setInterval(() => {
-          const r = card.getBoundingClientRect();
-          const p = document.createElement('div'); p.className = 'particle';
-          p.style.width = (Math.random() * 10 + 5) + 'px'; p.style.height = p.style.width;
-          p.style.background = data.color; p.style.boxShadow = `0 0 10px ${data.color}`;
-          p.style.left = (r.left + r.width / 2 + (Math.random() * 40 - 20)) + 'px';
-          p.style.top = (r.top + r.height + (Math.random() * 20)) + 'px';
-          scene.appendChild(p);
-          setTimeout(() => p.remove(), 1200);
-        }, 120);
+        // 포토타임 이펙트 활성화
+        const fxLayer = document.getElementById('phototime-fx');
+        fxLayer.classList.add('active');
 
+        // 리플로우 후 자연스러운 이동 애니메이션을 위해 원상복구
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%) scale(1)';
+          card.style.transition = 'left 2.5s cubic-bezier(0.25, 1, 0.5, 1), top 2.5s cubic-bezier(0.25, 1, 0.5, 1), transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s';
+          
+          // 5초 간 중앙에서 머무른 후, 최종 목적지로 한 번에 이동
+          setTimeout(() => {
+            fxLayer.classList.remove('active');
+            card.style.zIndex = 10;
+            // 지정된 목적지로 좌표 변경 (트랜지션을 타고 날아감)
+            card.style.left = finalX + 'px';
             card.style.top = finalY + 'px';
+            card.style.transform = 'translate(-50%, -50%) scale(1)';
+
+            // 도착할 때 즈음 floating 효과 재부여
             setTimeout(() => {
-              clearInterval(pInterval);
-              card.style.transform = 'translate(-50%, -50%)';
               card.classList.add('floating');
             }, 2500);
-          });
+          }, 5000); 
         });
       }
     }

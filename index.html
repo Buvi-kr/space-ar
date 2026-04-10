@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>포천아트밸리 소원 우주선</title>
+  <title>소원 우주선</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
 
@@ -19,23 +19,11 @@
       height: 100vh;
       background: url('assets/new_bg.webp') center/cover no-repeat;
       background-color: #050d21;
-      background-size: 110% 110%;
       overflow: hidden;
       font-family: 'Nanum Pen Script', cursive;
       user-select: none;
       touch-action: none;
       -webkit-touch-callout: none;
-      animation: bgPan 60s linear infinite alternate;
-    }
-
-    @keyframes bgPan {
-      0% {
-        background-position: 0% 0%;
-      }
-
-      100% {
-        background-position: 100% 100%;
-      }
     }
 
     body.admin-mode {
@@ -57,7 +45,7 @@
       font-family: 'Black Han Sans', sans-serif;
       font-size: 40px;
       letter-spacing: 3px;
-      text-shadow: 0 0 20px rgba(255, 200, 100, 0.6);
+      text-shadow: 0 0 10px rgba(255, 200, 100, 0.6);
     }
 
     #fullscreen-btn,
@@ -102,21 +90,24 @@
     /* ── Wish Card ─────────────────────────────────────── */
     .wish-card {
       position: absolute;
-      min-width: 84px;
-      max-width: 192px;
+      top: 0;
+      left: 0;
+      width: max-content;
+      height: max-content;
+      min-width: 80px;
+      max-width: 180px;
       min-height: 60px;
-      max-height: 150px;
+      max-height: 140px;
       background: rgba(10, 15, 30, 0.95);
       border-radius: 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 9px;
+      padding: 10px;
       pointer-events: auto;
       cursor: grab;
       will-change: transform;
-      /* NO CSS transition – physics loop controls everything */
     }
 
     .wish-card:active {
@@ -128,29 +119,24 @@
       border: 3px solid #ff4444 !important;
     }
 
-    /* Physics handles floating; only keep departing exit */
     .wish-card.departing {
       pointer-events: none;
       transition: transform 2s ease-in, opacity 2s ease-in !important;
-      transform: translate(-50%, -50%) translateY(-200vh) rotate(25deg) !important;
+      transform: translate3d(50vw, -200vh, 0) rotate(25deg) !important;
       opacity: 0 !important;
     }
 
-    /* Phototime: centre spotlight – still CSS so it snaps cleanly */
     .wish-card.phototime {
       z-index: 9999 !important;
-      left: 50% !important;
-      top: 50% !important;
-      transform: translate(-50%, -50%) scale(2) !important;
-      transition: left .5s cubic-bezier(.25, 1, .5, 1),
-        top .5s cubic-bezier(.25, 1, .5, 1),
-        transform .5s cubic-bezier(.25, 1, .5, 1) !important;
+      transform: translate3d(50vw, 50vh, 0) translate(-50%, -50%) scale(2) !important;
+      transition: transform 0.5s cubic-bezier(.25, 1, .5, 1) !important;
       cursor: pointer;
     }
 
     .wish-card img {
-      max-width: 100%;
-      max-height: 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
       z-index: 5;
       pointer-events: none;
     }
@@ -184,7 +170,7 @@
       height: 52px;
       border-radius: 50%;
       transform: translateY(17px);
-      animation: thrusterPulse .15s infinite alternate;
+      animation: thrusterPulse .3s infinite alternate;
     }
 
     @keyframes thrusterPulse {
@@ -194,29 +180,8 @@
       }
 
       100% {
-        transform: translateY(22px) scale(1.3);
+        transform: translateY(22px) scale(1.2);
         opacity: 1;
-      }
-    }
-
-    /* Particle */
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 1;
-      animation: particleFade 1.2s forwards ease-out;
-    }
-
-    @keyframes particleFade {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-
-      100% {
-        transform: scale(3) translateY(30px);
-        opacity: 0;
       }
     }
 
@@ -235,13 +200,7 @@
       cursor: pointer;
       z-index: 100;
       font-family: 'Black Han Sans', sans-serif;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(100, 200, 255, 0.4);
-      transition: all .3s;
-    }
-
-    #open-btn:hover {
-      transform: translateX(-50%) translateY(-4px) scale(1.04);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(100, 200, 255, 0.6);
+      transition: transform .3s;
     }
 
     /* ── Draw UI ───────────────────────────────────────── */
@@ -256,7 +215,6 @@
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-bottom: none;
       border-radius: 24px 24px 0 0;
-      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.8);
       z-index: 200;
       display: flex;
       flex-direction: column;
@@ -299,7 +257,6 @@
       border-radius: 50%;
       border: 2px solid rgba(255, 255, 255, 0.35);
       cursor: pointer;
-      transition: transform .2s, border-color .2s;
     }
 
     .color-btn.active {
@@ -422,22 +379,6 @@
       border-color: #ffc864;
     }
 
-    @media (max-width: 768px) {
-      #main-draw-area {
-        flex-direction: column;
-      }
-
-      #right-sidebar {
-        width: 100%;
-        flex: 0 0 auto;
-        display: block;
-      }
-
-      #sticker-grid {
-        grid-template-columns: repeat(8, 1fr);
-      }
-    }
-
     #warning-msg {
       color: #ff5555;
       font-size: 20px;
@@ -480,11 +421,9 @@
     #submit-btn {
       background: rgba(255, 255, 255, 0.9);
       color: #000;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
       font-size: 30px;
     }
 
-    /* Cursor marker */
     #cursor-marker {
       position: absolute;
       pointer-events: none;
@@ -494,11 +433,9 @@
       transform: translate(-50%, -50%);
       transition: width .1s, height .1s, background-color .1s;
       border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
       display: none;
     }
 
-    /* Phototime FX */
     #phototime-fx {
       position: absolute;
       top: 50%;
@@ -510,36 +447,15 @@
       opacity: 0;
       transition: opacity .5s;
       z-index: 9998;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 230, .5) 0%, rgba(255, 220, 100, .2) 20%, transparent 60%),
-        conic-gradient(from 0deg at 50% 50%,
-          transparent 0deg, rgba(255, 255, 255, .3) 45deg,
-          transparent 90deg, rgba(255, 255, 255, .3) 135deg,
-          transparent 180deg, rgba(255, 255, 255, .3) 225deg,
-          transparent 270deg, rgba(255, 255, 255, .3) 315deg,
-          transparent 360deg);
-      mix-blend-mode: screen;
-      will-change: opacity, transform;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .2) 0%, transparent 50%);
+      will-change: opacity;
     }
 
     #phototime-fx.active {
       opacity: 1;
-      animation: spotlightSpin 15s linear infinite;
     }
 
-    @keyframes spotlightSpin {
-      0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-      }
-
-      100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-      }
-    }
-
-    /* Drag highlight */
     .wish-card.dragging-active {
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.6) !important;
       z-index: 500 !important;
     }
   </style>
@@ -549,10 +465,10 @@
   <div id="scene"></div>
   <div id="phototime-fx"></div>
 
-  <button id="download-btn">💾 원본 다운로드</button>
-  <div id="main-title">포천 아트밸리 소원 우주선</div>
-  <button id="fullscreen-btn">🖥️ 전체화면 시작</button>
-  <button id="open-btn">소원 적어 보내기! 🚀</button>
+  <button id="download-btn">원본 다운로드</button>
+  <div id="main-title">소원 우주선</div>
+  <button id="fullscreen-btn">전체화면 시작</button>
+  <button id="open-btn">소원 적어 보내기!</button>
   <div id="admin-secret-zone"></div>
   <div id="cursor-marker"></div>
 
@@ -597,24 +513,21 @@
         <hr style="width:100%;border:0;border-top:1px solid rgba(255,255,255,0.2);margin:12px 0;">
         <span class="tool-title" style="display:block;margin-bottom:8px;">지우기 도구</span>
         <div style="display:flex;gap:8px;">
-          <button id="eraser-btn" class="erase-tool-btn">🧹 지우개</button>
-          <button id="clear-btn" class="erase-tool-btn" style="background:rgba(255,100,100,0.4);">🗑️ 모두 싹</button>
+          <button id="eraser-btn" class="erase-tool-btn">지우개</button>
+          <button id="clear-btn" class="erase-tool-btn" style="background:rgba(255,100,100,0.4);">모두 싹</button>
         </div>
       </div>
     </div>
 
     <div class="bottom-actions">
       <div id="warning-msg">소원을 먼저 그려야 우주로 보낼 수 있습니다!</div>
-      <button id="undo-btn">↩️ 되돌리기</button>
+      <button id="undo-btn">되돌리기</button>
       <button id="cancel-btn">접기</button>
-      <button id="submit-btn">우주로 발사 ✨</button>
+      <button id="submit-btn">우주로 발사</button>
     </div>
   </div>
 
   <script>
-    /* ============================================================
-       1. UTILITY UI
-       ============================================================ */
     document.getElementById('download-btn').addEventListener('click', () => {
       const clone = document.documentElement.cloneNode(true);
       clone.querySelector('#scene').innerHTML = '';
@@ -623,7 +536,7 @@
       const blob = new Blob(['<!DOCTYPE html>\n<html lang="ko">\n' + clone.innerHTML + '\n</html>'], { type: 'text/html;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'artvalley_wishes.html';
+      a.download = 'wishes.html';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     });
 
@@ -635,9 +548,6 @@
           .catch(e => alert(e));
     });
 
-    /* ============================================================
-       2. DRAWING CANVAS
-       ============================================================ */
     const canvas = document.getElementById('draw-canvas');
     const ctx = canvas.getContext('2d');
     const cursorMarker = document.getElementById('cursor-marker');
@@ -647,7 +557,7 @@
     let drawHistory = [];
 
     function saveHistory() {
-      if (drawHistory.length > 20) drawHistory.shift();
+      if (drawHistory.length > 4) drawHistory.shift();
       drawHistory.push(canvas.toDataURL());
     }
 
@@ -679,8 +589,6 @@
       ctx.lineWidth = eraserMode ? penSize * 5 : penSize * 1.5;
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
-      ctx.shadowBlur = eraserMode ? 0 : 5;
-      ctx.shadowColor = penColor;
       if (!stickerMode) {
         cursorMarker.style.width = ctx.lineWidth + 'px';
         cursorMarker.style.height = ctx.lineWidth + 'px';
@@ -761,7 +669,7 @@
     function placeSticker(e) {
       saveHistory();
       const p = getPos(e);
-      ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+      ctx.save(); ctx.globalCompositeOperation = 'source-over';
       ctx.font = stickerSize + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(currentSticker, p.x, p.y); ctx.restore();
       hasDrawn = true; document.getElementById('warning-msg').style.opacity = '0';
@@ -799,9 +707,6 @@
       saveHistory(); ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawn = false; resetIdleTimer();
     });
 
-    /* ============================================================
-       3. DRAW-UI OPEN / CLOSE / IDLE
-       ============================================================ */
     const drawUI = document.getElementById('draw-ui');
     const openBtn = document.getElementById('open-btn');
     let idleTimer;
@@ -834,10 +739,7 @@
       if (drawUI.classList.contains('open')) resizeCanvas();
     });
 
-    /* ============================================================
-       4. IMAGE CROP UTILITY
-       ============================================================ */
-    function cropCanvas(src, padding = 30) {
+    function cropCanvas(src, padding = 10) {
       const c = src.getContext('2d'), w = src.width, h = src.height;
       const data = c.getImageData(0, 0, w, h).data;
       let minX = w, minY = h, maxX = 0, maxY = 0, drawn = false;
@@ -853,37 +755,31 @@
       return cc.toDataURL('image/webp', 0.8);
     }
 
-    /* ============================================================
-       5. PHYSICS ENGINE
-       ============================================================ */
     const PHYSICS = {
       MAX_WISHES: 16,
       GRID_COLS: 4,
       GRID_ROWS: 4,
-      REPULSION_K: 0.04,  // AABB repulsion force multiplier (lower = softer push)
-      DRAG_PUSH_R: 360,   // drag-chain reaction radius
-      DRAG_PUSH_K: 0.55,  // drag push impulse multiplier
-      SPRING_K: 0.015,     // spring-to-target stiffness (lower = slower flight)
-      DAMPING: 0.82,  // velocity damping per frame
-      FLOAT_AMP: 9,     // floating amplitude (px)
-      FLOAT_SPEED: 0.018, // floating oscillation speed
+      REPULSION_K: 0.005,
+      DRAG_PUSH_R: 360,
+      DRAG_PUSH_K: 0.55,
+      SPRING_K: 0.015,
+      DAMPING: 0.82,
+      FLOAT_AMP: 9,
+      FLOAT_SPEED: 0.018,
       BOUNDARY_TOP: 110,
       BOUNDARY_SIDE: 160,
-      BOUNDARY_K: 0.14,  // boundary spring stiffness
+      BOUNDARY_K: 0.14,
       COLOR_PALETTE: ["#ff00ea", "#00d2ff", "#39ff14", "#ffeb3b", "#ff6b35", "#b15cff", "#ff5c8d", "#5cffda"],
     };
 
     const scene = document.getElementById('scene');
     const fxLayer = document.getElementById('phototime-fx');
-    let allWishes = [];    // physics objects
+    let allWishes = [];
     let rafId = null;
     let lastTs = 0;
-    // LocalStorage 사용 취소 (새로고침 시 완전 리셋)
 
-    /* ── Bottom safe zone (above launch button) ── */
     function bottomSafe() { return window.innerHeight - Math.max(200, window.innerHeight * 0.22); }
 
-    /* ── 4×4 Grid: find least-populated cell ── */
     function getBestTarget() {
       const wW = window.innerWidth, wH = window.innerHeight;
       const top = PHYSICS.BOUNDARY_TOP + 30;
@@ -893,7 +789,6 @@
       const cellW = (right - left) / PHYSICS.GRID_COLS;
       const cellH = (bot - top) / PHYSICS.GRID_ROWS;
 
-      // count how many non-departing wishes fall in each cell
       const grid = Array.from({ length: PHYSICS.GRID_ROWS }, () => new Array(PHYSICS.GRID_COLS).fill(0));
       allWishes.forEach(w => {
         if (w.departing) return;
@@ -904,14 +799,12 @@
         grid[r][c]++;
       });
 
-      // candidates = all cells with minimum count
       let minCount = Infinity;
       grid.forEach(row => row.forEach(v => { if (v < minCount) minCount = v; }));
       const candidates = [];
       grid.forEach((row, r) => row.forEach((v, c) => { if (v === minCount) candidates.push({ r, c }); }));
 
       const ch = candidates[Math.floor(Math.random() * candidates.length)];
-      // center of cell + small random jitter
       const tx = left + (ch.c + 0.5) * cellW + (Math.random() - 0.5) * cellW * 0.38;
       const ty = top + (ch.r + 0.5) * cellH + (Math.random() - 0.5) * cellH * 0.38;
 
@@ -921,9 +814,8 @@
       };
     }
 
-    /* ── RAF physics loop ── */
     function physicsLoop(ts) {
-      const dt = Math.min(32, ts - lastTs) / 16.67; // normalised to 60 fps
+      const dt = Math.min(32, ts - lastTs) / 16.67;
       lastTs = ts;
 
       const wW = window.innerWidth;
@@ -936,43 +828,37 @@
         w.phase += PHYSICS.FLOAT_SPEED;
 
         if (w.dragging) {
-          // position updated by pointer handler; zero velocity
           w.vx = 0; w.vy = 0;
           continue;
         }
 
-        /* Spring towards target */
         w.vx += (w.targetX - w.x) * PHYSICS.SPRING_K * dt;
         w.vy += (w.targetY - w.y) * PHYSICS.SPRING_K * dt;
 
-        /* Repulsion from other cards (말풍선+본체 덩어리 직사각형 AABB 충돌) */
         for (let j = 0; j < allWishes.length; j++) {
           if (i === j || allWishes[j].departing) continue;
           const o = allWishes[j];
           const dx = w.x - o.x;
           const dy = w.y - o.y;
-          
+
           const absDx = Math.abs(dx);
           const absDy = Math.abs(dy);
-          
-          // 전체 덩어리가 겹치지 않게 하는 직육면체 허용 영역
-          const minDx = 270;
-          const minDy = 350;
-          
+
+          const minDx = 160;
+          const minDy = 200;
+
           if (absDx < minDx && absDy < minDy) {
             const overlapX = minDx - absDx;
             const overlapY = minDy - absDy;
-            
-            // 더 가까운 축 방향으로 밀어내기
+
             if (overlapX < overlapY) {
-               w.vx += overlapX * PHYSICS.REPULSION_K * dt * Math.sign(dx || 1);
+              w.vx += overlapX * PHYSICS.REPULSION_K * dt * Math.sign(dx || 1);
             } else {
-               w.vy += overlapY * PHYSICS.REPULSION_K * dt * Math.sign(dy || 1);
+              w.vy += overlapY * PHYSICS.REPULSION_K * dt * Math.sign(dy || 1);
             }
           }
         }
 
-        /* Boundary springs */
         const BL = PHYSICS.BOUNDARY_SIDE, BR = wW - PHYSICS.BOUNDARY_SIDE;
         const BT = PHYSICS.BOUNDARY_TOP, BB = bot;
         const bk = PHYSICS.BOUNDARY_K * dt;
@@ -981,43 +867,25 @@
         if (w.y < BT) w.vy += (BT - w.y) * bk;
         if (w.y > BB) w.vy -= (w.y - BB) * bk;
 
-        /* Damping */
         w.vx *= Math.pow(PHYSICS.DAMPING, dt);
         w.vy *= Math.pow(PHYSICS.DAMPING, dt);
 
-        /* Integrate */
         w.x += w.vx * dt;
         w.y += w.vy * dt;
 
-        /* Apply to DOM: add floating sine offset */
         const floatY = Math.sin(w.phase) * PHYSICS.FLOAT_AMP;
         const floatR = Math.sin(w.phase * 0.7) * 1.6;
-        w.el.style.left = w.x + 'px';
-        w.el.style.top = (w.y + floatY) + 'px';
-        w.el.style.transform = `translate(-50%,-50%) rotate(${floatR}deg)`;
+        w.el.style.transform = `translate3d(${w.x}px, ${w.y + floatY}px, 0) translate(-50%, -50%) rotate(${floatR}deg)`;
       }
 
       rafId = requestAnimationFrame(physicsLoop);
     }
 
-    /* Start physics loop */
     rafId = requestAnimationFrame(t => { lastTs = t; physicsLoop(t); });
 
-    /* ============================================================
-       6. WISH CARD CREATION & LAUNCH
-       ============================================================ */
-    function saveToLS() {
-      // 로컬 스토리지 저장 기능 제거 (더미 데이터 방지)
-    }
-
-    function loadFromLS() {
-      // 로컬 스토리지 불러오기 기능 제거
-    }
-
-    /* ── Auto-crop → launch ── */
     document.getElementById('submit-btn').addEventListener('click', () => {
       if (!hasDrawn) { document.getElementById('warning-msg').style.opacity = '1'; return; }
-      const dataURL = cropCanvas(canvas, 30);
+      const dataURL = cropCanvas(canvas, 10);
       closeDrawUI();
       launchWish(dataURL);
     });
@@ -1027,13 +895,11 @@
       const shipId = Math.floor(Math.random() * 3) + 1;
       const data = { img: imgSrc, color, shipId };
 
-      /* Evict oldest if at capacity */
       if (allWishes.length >= PHYSICS.MAX_WISHES) {
         const oldest = allWishes.shift();
         evictCard(oldest);
       }
 
-      /* Target chosen from grid (computed now, card moves there after photo-time) */
       const target = getBestTarget();
       spawnCard(data, target.x, target.y, false);
     }
@@ -1042,21 +908,17 @@
       w.departing = true;
       w.el.classList.add('departing');
       setTimeout(() => { try { w.el.remove(); } catch (e) { } }, 2200);
-      saveToLS();
     }
 
-    /* ── Spawn a wish card ── */
     function spawnCard(data, finalX, finalY, immediate) {
       const card = document.createElement('div');
       card.className = 'wish-card';
       card.style.border = `3px solid ${data.color}`;
-      card.style.boxShadow = `0 0 10px ${data.color}80`;
       card.style.zIndex = '10';
-      card.style.transition = 'none';
 
       card.innerHTML = `
     <div class="speech-tail" style="border-top:16px solid ${data.color};"></div>
-    <img src="${data.img}" style="pointer-events:none;object-fit:contain;">
+    <img src="${data.img}">
     <div class="drone-base" style="background:url('assets/ship${data.shipId}_bg.png') center/contain no-repeat;">
       <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
       <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
@@ -1064,7 +926,6 @@
 
       scene.appendChild(card);
 
-      /* Physics state object */
       const w = {
         el: card,
         x: immediate ? finalX : window.innerWidth / 2,
@@ -1082,36 +943,25 @@
         shipId: data.shipId,
       };
       allWishes.push(w);
-      saveToLS();
 
-      /* Set initial DOM position */
-      card.style.left = w.x + 'px';
-      card.style.top = w.y + 'px';
-      card.style.transform = 'translate(-50%,-50%)';
+      card.style.transform = `translate3d(${w.x}px, ${w.y}px, 0) translate(-50%, -50%)`;
 
-      if (immediate) {
-        /* Loaded from storage – place directly */
-        return;
-      }
+      if (immediate) return;
 
-      /* ── Photo-time: stay centred 5s then fly to grid target ── */
       w.phototime = true;
-      card.style.zIndex = '9999';
-      card.style.transform = 'translate(-50%,-50%) scale(2)';
-      // 빛나는 효과(fxLayer) 활성화 취소
-      
+      card.classList.add('phototime');
+
       setTimeout(() => {
         if (!document.body.contains(card)) return;
         w.phototime = false;
+        card.classList.remove('phototime');
         w.x = window.innerWidth / 2;
         w.y = window.innerHeight / 2;
         w.vx = (Math.random() - 0.5) * 4;
         w.vy = (Math.random() - 0.5) * 4;
         card.style.zIndex = '10';
-        card.style.transform = 'translate(-50%,-50%)';
       }, 5000);
 
-      /* ── Click: toggle photo-time ── */
       card.addEventListener('click', e => {
         if (isAdminMode) {
           allWishes = allWishes.filter(x => x !== w);
@@ -1126,26 +976,21 @@
             if (w.phototime) {
               w.phototime = false;
               card.classList.remove('phototime');
-              /* Restore position to physics */
               w.x = finalX; w.y = finalY;
               card.style.zIndex = '10';
             }
           }, 5000);
         } else {
           card.classList.remove('phototime');
-          w.x = parseFloat(card.style.left) || finalX;
-          w.y = parseFloat(card.style.top) || finalY;
+          w.x = finalX;
+          w.y = finalY;
           card.style.zIndex = '10';
         }
       });
 
-      /* ── Drag: move card + push neighbours ── */
       attachDrag(card, w);
     }
 
-    /* ============================================================
-       7. DRAG WITH CHAIN-REACTION REPULSION
-       ============================================================ */
     function attachDrag(card, w) {
       let startPX = 0, startPY = 0, startWX = 0, startWY = 0, didDrag = false;
 
@@ -1156,7 +1001,6 @@
         startPX = cx; startPY = cy; startWX = w.x; startWY = w.y; didDrag = false;
         w.dragging = true;
         card.classList.add('dragging-active');
-        card.style.zIndex = '500';
         e.stopPropagation();
       }
 
@@ -1168,11 +1012,8 @@
         if (Math.abs(dx) + Math.abs(dy) > 4) didDrag = true;
         w.x = startWX + dx;
         w.y = startWY + dy;
-        card.style.left = w.x + 'px';
-        card.style.top = w.y + 'px';
-        card.style.transform = 'translate(-50%,-50%) scale(1.06)';
+        card.style.transform = `translate3d(${w.x}px, ${w.y}px, 0) translate(-50%,-50%) scale(1.06)`;
 
-        /* Push nearby cards (chain repulsion) */
         allWishes.forEach(other => {
           if (other === w || other.dragging || other.departing || other.phototime) return;
           const odx = other.x - w.x, ody = other.y - w.y;
@@ -1192,13 +1033,10 @@
         w.dragging = false;
         card.classList.remove('dragging-active');
         card.style.zIndex = '10';
-        /* Update resting target so physics spring stays here */
         w.targetX = w.x;
         w.targetY = w.y;
-        /* Small bounce impulse */
         w.vx = (Math.random() - 0.5) * 2;
         w.vy = (Math.random() - 0.5) * 2;
-        saveToLS();
       }
 
       card.addEventListener('mousedown', onDown, { passive: false });
@@ -1209,12 +1047,6 @@
       window.addEventListener('touchend', onUp);
     }
 
-    /* ============================================================
-       8. INIT
-       ============================================================ */
-    // loadFromLS(); // 더 이상 호출하지 않음
-
-    /* ── Admin mode ── */
     let adminClicks = 0, adminTimer, isAdminMode = false;
     document.getElementById('admin-secret-zone').addEventListener('click', () => {
       adminClicks++; clearTimeout(adminTimer);
@@ -1222,9 +1054,6 @@
       if (adminClicks >= 5) {
         isAdminMode = !isAdminMode; adminClicks = 0;
         document.body.classList.toggle('admin-mode', isAdminMode);
-        alert(isAdminMode
-          ? '⚠️ [관리자 모드 켜짐]\n소원 카드를 터치해 삭제하세요.'
-          : '✅ [관리자 모드 꺼짐]');
       }
     });
   </script>

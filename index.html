@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,7 +8,9 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap');
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -16,7 +19,8 @@
       height: 100vh;
       background: url('assets/new_bg.webp') center/cover no-repeat;
       background-color: #050d21;
-      background-size: 110% 110%; /* 여백을 두고 동적 이동을 위해 조금 크게 설정 */
+      background-size: 110% 110%;
+      /* 여백을 두고 동적 이동을 위해 조금 크게 설정 */
       overflow: hidden;
       font-family: 'Nanum Pen Script', cursive;
       user-select: none;
@@ -27,11 +31,18 @@
 
     /* 13. 배경 동적 애니메이션 */
     @keyframes bgPan {
-      0% { background-position: 0% 0%; }
-      100% { background-position: 100% 100%; }
+      0% {
+        background-position: 0% 0%;
+      }
+
+      100% {
+        background-position: 100% 100%;
+      }
     }
 
-    body.admin-mode { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8); }
+    body.admin-mode {
+      box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8);
+    }
 
     #scene {
       position: absolute;
@@ -51,7 +62,8 @@
       text-shadow: 0 0 20px rgba(255, 200, 100, 0.6);
     }
 
-    #fullscreen-btn, #download-btn {
+    #fullscreen-btn,
+    #download-btn {
       position: absolute;
       z-index: 1000;
       padding: 10px 20px;
@@ -62,10 +74,24 @@
       font-family: 'Black Han Sans', sans-serif;
       cursor: pointer;
     }
-    #fullscreen-btn { top: 25px; right: 25px; background: rgba(50, 50, 50, 0.8); }
-    #download-btn { top: 25px; left: 25px; background: rgba(0, 150, 75, 0.8); display: none; }
-    body.admin-mode #download-btn { display: block; }
-    
+
+    #fullscreen-btn {
+      top: 25px;
+      right: 25px;
+      background: rgba(50, 50, 50, 0.8);
+    }
+
+    #download-btn {
+      top: 25px;
+      left: 25px;
+      background: rgba(0, 150, 75, 0.8);
+      display: none;
+    }
+
+    body.admin-mode #download-btn {
+      display: block;
+    }
+
     #admin-secret-zone {
       position: absolute;
       top: 0;
@@ -83,7 +109,7 @@
       max-width: 320px;
       min-height: 100px;
       max-height: 250px;
-      
+
       background: rgba(10, 15, 30, 0.85);
       border-radius: 24px;
       display: flex;
@@ -95,7 +121,7 @@
       transition: left 2.5s cubic-bezier(0.25, 1, 0.5, 1), top 2.5s cubic-bezier(0.25, 1, 0.5, 1), transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1s;
       transform-origin: center;
     }
-    
+
     body.admin-mode .wish-card {
       pointer-events: auto;
       cursor: pointer;
@@ -105,8 +131,9 @@
     /* 도착 후 플로팅 효과 부여 CSS 클래스 */
     .wish-card.floating {
       animation: floatAnim 3s infinite ease-in-out;
-      z-index: 100; 
+      z-index: 100;
     }
+
     .wish-card.departing {
       transform: translateY(-200vh) rotate(25deg);
       opacity: 0;
@@ -114,12 +141,24 @@
     }
 
     @keyframes floatAnim {
-      0% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-12px) rotate(2deg); }
-      100% { transform: translateY(0px) rotate(0deg); }
+      0% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-12px) rotate(2deg);
+      }
+
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
     }
 
-    .wish-card img { max-width: 100%; max-height: 100%; z-index: 5; }
+    .wish-card img {
+      max-width: 100%;
+      max-height: 100%;
+      z-index: 5;
+    }
 
     .speech-tail {
       position: absolute;
@@ -133,11 +172,14 @@
 
     .drone-base {
       position: absolute;
-      bottom: -65px; /* Absolute fixed distance below card */
+      bottom: -65px;
+      /* Absolute fixed distance below card */
       left: 50%;
       transform: translateX(-50%);
-      width: 130px; /* Fixed width */
-      height: 60px; /* Fixed height */
+      width: 130px;
+      /* Fixed width */
+      height: 60px;
+      /* Fixed height */
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -154,8 +196,15 @@
     }
 
     @keyframes thrusterPulse {
-      0% { transform: translateY(9px) scale(0.9); opacity: 0.8; }
-      100% { transform: translateY(13px) scale(1.3); opacity: 1; }
+      0% {
+        transform: translateY(9px) scale(0.9);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translateY(13px) scale(1.3);
+        opacity: 1;
+      }
     }
 
     /* 7. 파티클 이펙트 */
@@ -166,9 +215,17 @@
       z-index: 1;
       animation: particleFade 1.2s forwards ease-out;
     }
+
     @keyframes particleFade {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(3) translateY(30px); opacity: 0; }
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(3) translateY(30px);
+        opacity: 0;
+      }
     }
 
     /* 발사 버튼 */
@@ -189,7 +246,11 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(100, 200, 255, 0.4);
       transition: all 0.3s;
     }
-    #open-btn:hover { transform: translateX(-50%) translateY(-4px) scale(1.04); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(100, 200, 255, 0.6); }
+
+    #open-btn:hover {
+      transform: translateX(-50%) translateY(-4px) scale(1.04);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(100, 200, 255, 0.6);
+    }
 
     /* 3. 그리기 패널 (세로형 전시 키오스크 비율) */
     #draw-ui {
@@ -212,7 +273,10 @@
       transition: bottom 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       overflow: hidden;
     }
-    #draw-ui.open { bottom: 0; }
+
+    #draw-ui.open {
+      bottom: 0;
+    }
 
     #toolbar {
       width: 100%;
@@ -224,88 +288,224 @@
       flex-wrap: wrap;
     }
 
-    .tool-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .tool-title { color: #fff; font-family: 'Black Han Sans', sans-serif; font-size: 18px; }
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tool-title {
+      color: #fff;
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 18px;
+    }
 
     .color-btn {
-      width: 40px; height: 40px; border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.35); cursor: pointer; transition: transform 0.2s, border-color 0.2s;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
     }
-    .color-btn.active { transform: scale(1.3); border-color: #fff; }
+
+    .color-btn.active {
+      transform: scale(1.3);
+      border-color: #fff;
+    }
 
     .size-btn {
-      padding: 8px 16px; font-size: 18px; border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(30, 30, 40, 0.7); color: #ccc; border-radius: 8px;
-      font-family: 'Black Han Sans', sans-serif; cursor: pointer;
+      padding: 8px 16px;
+      font-size: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(30, 30, 40, 0.7);
+      color: #ccc;
+      border-radius: 8px;
+      font-family: 'Black Han Sans', sans-serif;
+      cursor: pointer;
     }
-    .size-btn.active { background: rgba(255, 255, 255, 0.9); color: #000; border-color: #fff; }
+
+    .size-btn.active {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      border-color: #fff;
+    }
 
     #main-draw-area {
-      display: flex; flex-direction: row; width: 100%; flex: 1 1 auto; gap: 16px; margin-bottom: 16px; min-height: 0;
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      flex: 1 1 auto;
+      gap: 16px;
+      margin-bottom: 16px;
+      min-height: 0;
     }
+
     #draw-canvas {
-      background: rgba(0, 0, 0, 0.5); border-radius: 12px; flex: 1 1 0; min-width: 0; min-height: 200px;
-      touch-action: none; cursor: crosshair; border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 200px;
+      touch-action: none;
+      cursor: crosshair;
+      border: 2px solid rgba(255, 255, 255, 0.2);
     }
 
     #right-sidebar {
-      width: 260px; flex-shrink: 0; background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px;
-      display: flex; flex-direction: column; overflow-y: auto;
+      width: 260px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
     }
 
     #sticker-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
     }
+
     .sticker-btn {
-      font-size: 26px; width: 100%; height: 46px; background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: all 0.15s; line-height: 1;
+      font-size: 26px;
+      width: 100%;
+      height: 46px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      line-height: 1;
     }
-    .sticker-btn.active { background: rgba(255, 220, 80, 0.4); border-color: #ffd700; transform: scale(1.15); }
-    
+
+    .sticker-btn.active {
+      background: rgba(255, 220, 80, 0.4);
+      border-color: #ffd700;
+      transform: scale(1.15);
+    }
+
     .ssize-btn {
-      padding: 8px 0; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(30, 30, 40, 0.7); color: #ccc; border-radius: 6px;
-      font-family: 'Black Han Sans', sans-serif; cursor: pointer; flex: 1; text-align: center;
+      padding: 8px 0;
+      font-size: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(30, 30, 40, 0.7);
+      color: #ccc;
+      border-radius: 6px;
+      font-family: 'Black Han Sans', sans-serif;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
     }
-    .ssize-btn.active { background: rgba(255, 255, 255, 0.9); color: #000; }
+
+    .ssize-btn.active {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+    }
 
     .erase-tool-btn {
-      padding: 12px; font-size: 18px; border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(30, 30, 40, 0.7); color: #fff; border-radius: 8px;
-      font-family: 'Black Han Sans', sans-serif; cursor: pointer; flex: 1; text-align: center;
+      padding: 12px;
+      font-size: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(30, 30, 40, 0.7);
+      color: #fff;
+      border-radius: 8px;
+      font-family: 'Black Han Sans', sans-serif;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
     }
-    #eraser-btn.active { background: rgba(255, 200, 100, 0.9); color: #000; border-color: #ffc864; }
+
+    #eraser-btn.active {
+      background: rgba(255, 200, 100, 0.9);
+      color: #000;
+      border-color: #ffc864;
+    }
 
     @media (max-width: 768px) {
-      #main-draw-area { flex-direction: column; }
-      #right-sidebar { width: 100%; flex: 0 0 auto; display: block; }
-      #sticker-grid { grid-template-columns: repeat(8, 1fr); }
+      #main-draw-area {
+        flex-direction: column;
+      }
+
+      #right-sidebar {
+        width: 100%;
+        flex: 0 0 auto;
+        display: block;
+      }
+
+      #sticker-grid {
+        grid-template-columns: repeat(8, 1fr);
+      }
     }
 
     #warning-msg {
-      color: #ff5555; font-size: 20px; opacity: 0; transition: opacity 0.3s;
-      position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
-      white-space: nowrap; font-family: 'Black Han Sans', sans-serif;
+      color: #ff5555;
+      font-size: 20px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-family: 'Black Han Sans', sans-serif;
     }
 
-    .bottom-actions { display: flex; gap: 16px; position: relative; flex-shrink: 0; }
-    .bottom-actions button {
-      padding: 15px 35px; font-size: 26px; border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px; font-family: 'Black Han Sans', sans-serif; cursor: pointer;
+    .bottom-actions {
+      display: flex;
+      gap: 16px;
+      position: relative;
+      flex-shrink: 0;
     }
-    #undo-btn { background: rgba(40, 100, 160, 0.8); color: #fff; }
-    #cancel-btn { background: rgba(100, 100, 110, 0.8); color: #fff; }
-    #submit-btn { background: rgba(255, 255, 255, 0.9); color: #000; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); font-size: 30px;}
+
+    .bottom-actions button {
+      padding: 15px 35px;
+      font-size: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-family: 'Black Han Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    #undo-btn {
+      background: rgba(40, 100, 160, 0.8);
+      color: #fff;
+    }
+
+    #cancel-btn {
+      background: rgba(100, 100, 110, 0.8);
+      color: #fff;
+    }
+
+    #submit-btn {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      font-size: 30px;
+    }
 
     /* 9. 펜 직관성 커서 마커 */
     #cursor-marker {
-      position: absolute; pointer-events: none; border-radius: 50%; opacity: 0;
-      z-index: 10000; transform: translate(-50%, -50%); transition: width 0.1s, height 0.1s, background-color 0.1s;
-      border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none;
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      opacity: 0;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: width 0.1s, height 0.1s, background-color 0.1s;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      display: none;
     }
-  
+
     .wish-card.phototime {
       z-index: 9999 !important;
       left: 50% !important;
@@ -313,31 +513,42 @@
       transform: translate(-50%, -50%) scale(2) !important;
       transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    
+
     #phototime-fx {
       position: absolute;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
-      width: 150vw; height: 150vw;
+      width: 150vw;
+      height: 150vw;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.5s;
-      z-index: 9998; /* Underneath the phototime card */
-      background: 
-        radial-gradient(circle at 50% 50%, rgba(255,255,230,0.5) 0%, rgba(255,220,100,0.2) 20%, transparent 60%),
-        conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255,255,255,0.3) 45deg, transparent 90deg, rgba(255,255,255,0.3) 135deg, transparent 180deg, rgba(255,255,255,0.3) 225deg, transparent 270deg, rgba(255,255,255,0.3) 315deg, transparent 360deg);
+      z-index: 9998;
+      /* Underneath the phototime card */
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 230, 0.5) 0%, rgba(255, 220, 100, 0.2) 20%, transparent 60%),
+        conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 255, 255, 0.3) 45deg, transparent 90deg, rgba(255, 255, 255, 0.3) 135deg, transparent 180deg, rgba(255, 255, 255, 0.3) 225deg, transparent 270deg, rgba(255, 255, 255, 0.3) 315deg, transparent 360deg);
       mix-blend-mode: screen;
     }
+
     #phototime-fx.active {
       opacity: 1;
       animation: spotlightSpin 15s linear infinite;
     }
+
     @keyframes spotlightSpin {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+
+      100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
     }
-</style>
+  </style>
 </head>
+
 <body oncontextmenu="return false;">
   <div id="earth-ground"></div>
   <div id="scene"></div>
@@ -349,7 +560,7 @@
   <button id="fullscreen-btn">🖥️ 전체화면 시작</button>
   <button id="open-btn">소원 적어 보내기! 🚀</button>
   <div id="admin-secret-zone"></div>
-  
+
   <div id="cursor-marker"></div>
 
   <div id="draw-ui">
@@ -442,26 +653,26 @@
     let isDrawing = false, hasDrawn = false;
     let penColor = '#ffffff', penSize = 4.0;
     let eraserMode = false, stickerMode = false, currentSticker = '', stickerSize = 50;
-    
+
     // 11. 실행취소(Undo) 로직용 배열
     let drawHistory = [];
 
     function saveHistory() {
-      if(drawHistory.length > 20) drawHistory.shift();
+      if (drawHistory.length > 20) drawHistory.shift();
       drawHistory.push(canvas.toDataURL());
     }
-    
+
     document.getElementById('undo-btn').addEventListener('click', () => {
       resetIdleTimer();
-      if(drawHistory.length > 0) {
+      if (drawHistory.length > 0) {
         const img = new Image();
         img.src = drawHistory.pop();
         img.onload = () => {
-          ctx.clearRect(0,0, canvas.width, canvas.height);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0);
         };
       } else {
-        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         hasDrawn = false;
       }
     });
@@ -485,9 +696,9 @@
       ctx.globalCompositeOperation = eraserMode ? 'destination-out' : 'source-over';
       ctx.shadowBlur = eraserMode ? 0 : 5;
       ctx.shadowColor = penColor;
-      
+
       // 9. 마커 스타일 업데이트
-      if(!stickerMode) {
+      if (!stickerMode) {
         cursorMarker.style.width = (ctx.lineWidth) + 'px';
         cursorMarker.style.height = (ctx.lineWidth) + 'px';
         cursorMarker.style.backgroundColor = eraserMode ? 'rgba(255,255,255,0.7)' : penColor;
@@ -498,7 +709,7 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
         penColor = btn.dataset.color;
-        
+
         eraserMode = false; stickerMode = false; cursorMarker.style.display = 'block';
         document.getElementById('eraser-btn').classList.remove('active');
         document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('active'));
@@ -556,17 +767,17 @@
       const cy = e.touches ? e.touches[0].clientY : e.clientY;
       return { x: (cx - r.left) * (canvas.width / r.width), y: (cy - r.top) * (canvas.height / r.height), cx, cy };
     }
-    
+
     document.addEventListener('mousemove', (e) => {
-      if(stickerMode) return;
+      if (stickerMode) return;
       cursorMarker.style.left = e.clientX + 'px'; cursorMarker.style.top = e.clientY + 'px';
     });
     document.addEventListener('touchmove', (e) => {
-      if(stickerMode) return;
-      if(e.touches) { cursorMarker.style.left = e.touches[0].clientX + 'px'; cursorMarker.style.top = e.touches[0].clientY + 'px'; }
+      if (stickerMode) return;
+      if (e.touches) { cursorMarker.style.left = e.touches[0].clientX + 'px'; cursorMarker.style.top = e.touches[0].clientY + 'px'; }
     });
-    
-    canvas.addEventListener('mouseenter', () => { if(!stickerMode) { cursorMarker.style.opacity = '1'; cursorMarker.style.display = 'block'; }applyCtxStyle(); });
+
+    canvas.addEventListener('mouseenter', () => { if (!stickerMode) { cursorMarker.style.opacity = '1'; cursorMarker.style.display = 'block'; } applyCtxStyle(); });
     canvas.addEventListener('mouseleave', () => cursorMarker.style.opacity = '0');
 
     function placeSticker(e) {
@@ -577,9 +788,9 @@
       ctx.fillText(currentSticker, p.x, p.y);
       ctx.restore();
       hasDrawn = true; document.getElementById('warning-msg').style.opacity = '0';
-      
+
       // 2. 스티커 1회용 토글 로직
-      stickerMode = false; 
+      stickerMode = false;
       document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('active'));
       canvas.className = '';
       cursorMarker.style.display = 'block';
@@ -588,7 +799,7 @@
     }
 
     function startDraw(e) {
-      if(e.type === 'touchstart') e.preventDefault(); 
+      if (e.type === 'touchstart') e.preventDefault();
       resetIdleTimer();
       if (stickerMode) { placeSticker(e); return; }
       saveHistory(); // Save before drawing line
@@ -596,9 +807,9 @@
       const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
       cursorMarker.style.opacity = '1';
     }
-    
+
     function doDraw(e) {
-      if(e.type === 'touchmove') e.preventDefault();
+      if (e.type === 'touchmove') e.preventDefault();
       if (stickerMode || !isDrawing) return;
       resetIdleTimer(); hasDrawn = true;
       const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke();
@@ -640,44 +851,44 @@
     // 3. 우주선 체류/배치/저장 알고리즘 (5. 6. 7. 8. 12. 14 반영)
     // -----------------------------------------
     const scene = document.getElementById('scene');
-    let allWishes = []; 
+    let allWishes = [];
     // 로컬 스토리지에 저장해서 세로고침 보호
     const STORAGE_KEY = 'artvalley_wishes';
 
     // 5. 그리드 시스템
     const MAX_WISHES = 12;
     const colorPalette = ["#ff00ea", "#00d2ff", "#39ff14", "#ffeb3b", "#ff6b35", "#b15cff", "#ff5c8d", "#5cffda"];
-    
-    
+
+
     function saveToLocalStorage() {
       const data = allWishes.map(w => ({ img: w.imgSrc, color: w.color, finalX: w.finalX, finalY: w.finalY, shipId: w.shipId }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
-    
+
     function loadFromLocalStorage() {
       const svd = localStorage.getItem(STORAGE_KEY);
-      if(!svd) return;
+      if (!svd) return;
       try {
         const data = JSON.parse(svd);
         data.forEach(d => {
           createWishElement(d, d.finalX, d.finalY, true); // 바로 배치
         });
-      } catch(e) {}
+      } catch (e) { }
     }
 
 
 
-    
+
     // 1. Auto Crop Canvas Function
     function cropCanvas(sourceCanvas, padding = 30) {
       const ctx = sourceCanvas.getContext('2d');
       const w = sourceCanvas.width;
       const h = sourceCanvas.height;
       const data = ctx.getImageData(0, 0, w, h).data;
-      
+
       let minX = w, minY = h, maxX = 0, maxY = 0;
       let drawn = false;
-      
+
       for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
           const alpha = data[(y * w + x) * 4 + 3];
@@ -690,29 +901,29 @@
           }
         }
       }
-      
+
       if (!drawn) return sourceCanvas.toDataURL('image/webp', 0.6); // Empty
-      
+
       // Apply Padding
       minX = Math.max(0, minX - padding);
       minY = Math.max(0, minY - padding);
       maxX = Math.min(w, maxX + padding);
       maxY = Math.min(h, maxY + padding);
-      
+
       const width = maxX - minX;
       const height = maxY - minY;
-      
+
       const cropCanvas = document.createElement('canvas');
       cropCanvas.width = width;
       cropCanvas.height = height;
       const cropCtx = cropCanvas.getContext('2d');
-      
+
       cropCtx.drawImage(
         sourceCanvas,
         minX, minY, width, height,
         0, 0, width, height
       );
-      
+
       return cropCanvas.toDataURL('image/webp', 0.8);
     }
 
@@ -723,8 +934,8 @@
       launchNewWish(dataURL);
     });
 
-    
-    
+
+
     // 구름 군락(Cloud Cluster) 노드들 정의
     const cloudNodes = [
       { cx: 250, cy: 300 }, // 좌상단
@@ -736,63 +947,63 @@
     // 신규 소원 발사
     function launchNewWish(imgSrc) {
       const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-      
+
       let valid = false, fx = 0, fy = 0;
       let wW = window.innerWidth, wH = window.innerHeight;
-      
+
       // 구름 기반 무작위 흩뿌림
-      for(let i=0; i<100; i++) {
+      for (let i = 0; i < 100; i++) {
         // 랜덤 구름 노드 선택
         const node = cloudNodes[Math.floor(Math.random() * cloudNodes.length)];
-        
+
         // 반경 내 랜덤 지터(떨림)
         fx = node.cx + (Math.random() * 300 - 150);
         fy = node.cy + (Math.random() * 250 - 125);
-        
+
         let cx = wW / 2, cy = wH / 2;
-        
+
         // 화면 가장자리 여백 확보
         if (fx < 150 || fx > wW - 150) continue;
         if (fy < 100 || fy > wH - 180) continue;
-        
+
         // 중앙 포토타임 존 절대 침범 금지
-        if(Math.abs(fx - cx) < 350 && Math.abs(fy - cy) < 250) continue;
+        if (Math.abs(fx - cx) < 350 && Math.abs(fy - cy) < 250) continue;
         // 하단 소원 버튼 영역 절대 침범 금지
-        if(fy > wH - Math.max(200, wH*0.2) && Math.abs(fx - cx) < 350) continue;
-        
+        if (fy > wH - Math.max(200, wH * 0.2) && Math.abs(fx - cx) < 350) continue;
+
         // 우주선끼리 심한 겹침 방지 (공간 확보)
         let overlap = false;
-        for(let w of allWishes) {
-          if(!w.el.classList.contains('departing') && Math.abs(fx - w.finalX) < 180 && Math.abs(fy - w.finalY) < 150) {
+        for (let w of allWishes) {
+          if (!w.el.classList.contains('departing') && Math.abs(fx - w.finalX) < 180 && Math.abs(fy - w.finalY) < 150) {
             overlap = true; break;
           }
         }
-        if(!overlap) { valid = true; break; }
+        if (!overlap) { valid = true; break; }
       }
-      
-      if(!valid || allWishes.length >= MAX_WISHES) {
+
+      if (!valid || allWishes.length >= MAX_WISHES) {
         const oldest = allWishes[0];
-        if(oldest) {
+        if (oldest) {
           oldest.el.classList.add('departing');
           allWishes.shift();
-          setTimeout(() => { try { oldest.el.remove(); } catch(e){} }, 2000);
+          setTimeout(() => { try { oldest.el.remove(); } catch (e) { } }, 2000);
         }
       }
-      
+
       const dataInfo = { img: imgSrc, color: randomColor, shipId: (Math.floor(Math.random() * 3) + 1) };
       createWishElement(dataInfo, fx, fy, false);
     }
-    
+
     function createWishElement(data, finalX, finalY, immediate) {
       const card = document.createElement('div');
       card.className = 'wish-card';
       card.style.border = `3px solid ${data.color}`;
       card.style.boxShadow = `0 0 25px ${data.color}80`;
-      card.style.backgroundColor = data.color + '40'; 
-      card.style.backdropFilter = 'blur(4px)'; 
+      card.style.backgroundColor = data.color + '40';
+      card.style.backdropFilter = 'blur(4px)';
       card.style.webkitBackdropFilter = 'blur(4px)';
       card.style.cursor = 'pointer'; // 드래그/클릭 유도
-      
+
       card.innerHTML = `
         <div class="speech-tail" style="border-top:16px solid ${data.color};"></div>
         <img src="${data.img}" style="pointer-events: none; object-fit: contain;">
@@ -800,22 +1011,22 @@
           <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
           <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
         </div>`;
-      
+
       scene.appendChild(card);
-      
+
       const wishObj = { el: card, createdAt: Date.now(), finalX: finalX, finalY: finalY, imgSrc: data.img, color: data.color, shipId: data.shipId };
       allWishes.push(wishObj);
       saveToLocalStorage();
-      
+
       let isPhotoTime = false;
       let originalLeft = finalX + 'px';
       let originalTop = finalY + 'px';
-      
+
       // 관리자 강제삭제 & 중앙 포토존 연동
       card.addEventListener('click', (e) => {
-        if (isAdminMode) { 
-          card.remove(); 
-          allWishes = allWishes.filter(w => w !== wishObj); 
+        if (isAdminMode) {
+          card.remove();
+          allWishes = allWishes.filter(w => w !== wishObj);
           saveToLocalStorage();
         } else {
           // 중앙 포토존 이동 연동 (클릭/터치)
@@ -824,10 +1035,10 @@
           if (isPhotoTime) {
             card.classList.add('phototime');
             card.classList.remove('floating');
-            fxLayer.classList.add('active'); 
-            
+            fxLayer.classList.add('active');
+
             setTimeout(() => {
-              if(isPhotoTime && document.body.contains(card)) {
+              if (isPhotoTime && document.body.contains(card)) {
                 isPhotoTime = false;
                 card.classList.remove('phototime');
                 card.classList.add('floating');
@@ -844,19 +1055,19 @@
 
       // 마우스/터치 드래그 연동 기능 (포토존 유도용 단순 반응)
       let isDragging = false, startY = 0;
-      card.addEventListener('mousedown', (e) => { if(!isAdminMode) { isDragging=true; startY=e.clientY; }});
-      card.addEventListener('touchstart', (e) => { if(!isAdminMode) { isDragging=true; startY=e.touches[0].clientY; }});
-      window.addEventListener('mouseup', () => { if(isDragging && !isPhotoTime) { isDragging=false; }});
-      window.addEventListener('touchend', () => { if(isDragging && !isPhotoTime) { isDragging=false; }});
+      card.addEventListener('mousedown', (e) => { if (!isAdminMode) { isDragging = true; startY = e.clientY; } });
+      card.addEventListener('touchstart', (e) => { if (!isAdminMode) { isDragging = true; startY = e.touches[0].clientY; } });
+      window.addEventListener('mouseup', () => { if (isDragging && !isPhotoTime) { isDragging = false; } });
+      window.addEventListener('touchend', () => { if (isDragging && !isPhotoTime) { isDragging = false; } });
 
-      if(immediate) {
-        card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';  
+      if (immediate) {
+        card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';
         card.style.top = finalY + 'px';
         card.classList.add('floating');
       } else {
         card.style.zIndex = 10;
         card.style.left = (window.innerWidth / 2) + 'px';
-        card.style.top = (window.innerHeight + 200) + 'px'; 
+        card.style.top = (window.innerHeight + 200) + 'px';
         card.style.transform = 'translate(-50%, -50%) scale(0.3)';
 
         const pInterval = setInterval(() => {
@@ -864,8 +1075,8 @@
           const p = document.createElement('div'); p.className = 'particle';
           p.style.width = (Math.random() * 10 + 5) + 'px'; p.style.height = p.style.width;
           p.style.background = data.color; p.style.boxShadow = `0 0 10px ${data.color}`;
-          p.style.left = (r.left + r.width/2 + (Math.random()*40-20)) + 'px';
-          p.style.top = (r.top + r.height + (Math.random()*20)) + 'px';
+          p.style.left = (r.left + r.width / 2 + (Math.random() * 40 - 20)) + 'px';
+          p.style.top = (r.top + r.height + (Math.random() * 20)) + 'px';
           scene.appendChild(p);
           setTimeout(() => p.remove(), 1200);
         }, 120);
@@ -877,48 +1088,13 @@
             setTimeout(() => {
               clearInterval(pInterval);
               card.style.transform = 'translate(-50%, -50%)';
-              card.classList.add('floating'); 
+              card.classList.add('floating');
             }, 2500);
           });
         });
       }
     }
-      });
 
-      if(immediate) {
-        card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%)';  
-        card.style.top = finalY + 'px';
-        card.classList.add('floating');
-      } else {
-        card.style.zIndex = 10;
-        card.style.left = (window.innerWidth / 2) + 'px';
-        card.style.top = (window.innerHeight + 200) + 'px'; 
-        card.style.transform = 'translate(-50%, -50%) scale(0.3)';
-
-        const pInterval = setInterval(() => {
-          const r = card.getBoundingClientRect();
-          const p = document.createElement('div'); p.className = 'particle';
-          p.style.width = (Math.random() * 10 + 5) + 'px'; p.style.height = p.style.width;
-          p.style.background = data.color; p.style.boxShadow = `0 0 10px ${data.color}`;
-          p.style.left = (r.left + r.width/2 + (Math.random()*40-20)) + 'px';
-          p.style.top = (r.top + r.height + (Math.random()*20)) + 'px';
-          scene.appendChild(p);
-          setTimeout(() => p.remove(), 1200);
-        }, 120);
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            card.style.left = finalX + 'px'; card.style.transform = 'translate(-50%, -50%) scale(1)';
-            card.style.top = finalY + 'px';
-            setTimeout(() => {
-              clearInterval(pInterval);
-              card.style.transform = 'translate(-50%, -50%)';
-              card.classList.add('floating'); 
-            }, 2500);
-          });
-        });
-      }
-    }
 
 
     // 초기화 과정
@@ -936,4 +1112,5 @@
     });
   </script>
 </body>
+
 </html>

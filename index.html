@@ -27,7 +27,7 @@
     }
 
     body.admin-mode {
-      box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.8);
+      border: 5px solid #ff0000;
     }
 
     #scene {
@@ -45,7 +45,6 @@
       font-family: 'Black Han Sans', sans-serif;
       font-size: 40px;
       letter-spacing: 3px;
-      text-shadow: 0 0 10px rgba(255, 200, 100, 0.6);
     }
 
     #fullscreen-btn,
@@ -87,105 +86,106 @@
       z-index: 1000;
     }
 
-    /* ── Wish Card ─────────────────────────────────────── */
-    .wish-card {
+    /* ── 우주선 덩어리 구조 ── */
+    .wish-wrap {
       position: absolute;
       top: 0;
       left: 0;
-      width: max-content;
-      height: max-content;
-      min-width: 80px;
-      max-width: 180px;
-      min-height: 60px;
-      max-height: 140px;
-      background: rgba(10, 15, 30, 0.95);
-      border-radius: 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 10px;
-      pointer-events: auto;
       cursor: grab;
       will-change: transform;
+      z-index: 10;
     }
 
-    .wish-card:active {
+    .wish-wrap:active {
       cursor: grabbing;
     }
 
-    body.admin-mode .wish-card {
-      cursor: pointer;
-      border: 3px solid #ff4444 !important;
-    }
-
-    .wish-card.departing {
-      pointer-events: none;
-      transition: transform 2s ease-in, opacity 2s ease-in !important;
-      transform: translate3d(50vw, -200vh, 0) rotate(25deg) !important;
-      opacity: 0 !important;
-    }
-
-    .wish-card.phototime {
-      z-index: 9999 !important;
-      transform: translate3d(50vw, 50vh, 0) translate(-50%, -50%) scale(2) !important;
-      transition: transform 0.5s cubic-bezier(.25, 1, .5, 1) !important;
+    body.admin-mode .wish-wrap {
       cursor: pointer;
     }
 
-    .wish-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    .speech-tail {
-      position: absolute;
-      bottom: -16px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      z-index: 2;
-    }
-
-    .drone-base {
-      position: absolute;
-      bottom: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 227px;
-      height: 105px;
+    .bubble {
+      position: relative;
+      background: rgba(10, 15, 30, 0.95);
+      border-radius: 16px;
+      padding: 10px;
+      width: max-content;
+      min-width: 100px;
+      max-width: 200px;
+      min-height: 60px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      padding: 0 35px;
-      z-index: 4;
     }
 
-    .drone-thruster {
-      width: 31px;
-      height: 52px;
+    .bubble img {
+      max-width: 100%;
+      max-height: 100px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .tail {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+    }
+
+    .ship {
+      width: 180px;
+      height: 80px;
+      margin-top: 15px;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+      pointer-events: none;
+    }
+
+    .thruster {
+      position: absolute;
+      bottom: -10px;
+      width: 20px;
+      height: 30px;
       border-radius: 50%;
-      transform: translateY(17px);
-      animation: thrusterPulse .3s infinite alternate;
+      background: #fff;
+      animation: thrust 0.3s infinite alternate;
     }
 
-    @keyframes thrusterPulse {
+    .thruster.left {
+      left: 45px;
+    }
+
+    .thruster.right {
+      right: 45px;
+    }
+
+    @keyframes thrust {
       0% {
-        transform: translateY(16px) scale(0.9);
-        opacity: 0.8;
+        transform: scale(0.8);
+        opacity: 0.7;
       }
 
       100% {
-        transform: translateY(22px) scale(1.2);
+        transform: scale(1.2);
         opacity: 1;
       }
     }
 
-    /* ── Launch Button ─────────────────────────────────── */
+    .wish-wrap.departing {
+      pointer-events: none;
+      transition: transform 2s ease-in, opacity 2s ease-in !important;
+      transform: translate3d(50vw, -150vh, 0) rotate(25deg) scale(1) !important;
+      opacity: 0 !important;
+    }
+
+    /* ── Launch Button ── */
     #open-btn {
       position: absolute;
       bottom: 40px;
@@ -203,7 +203,7 @@
       transition: transform .3s;
     }
 
-    /* ── Draw UI ───────────────────────────────────────── */
+    /* ── Draw UI ── */
     #draw-ui {
       position: absolute;
       bottom: -600px;
@@ -220,7 +220,7 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
-      transition: bottom .5s cubic-bezier(.2, .8, .2, 1);
+      transition: bottom 0.4s cubic-bezier(.2, .8, .2, 1);
       overflow: hidden;
     }
 
@@ -242,7 +242,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
     }
 
     .tool-title {
@@ -329,11 +328,6 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-      line-height: 1;
     }
 
     .sticker-btn.active {
@@ -431,39 +425,14 @@
       opacity: 0;
       z-index: 10000;
       transform: translate(-50%, -50%);
-      transition: width .1s, height .1s, background-color .1s;
       border: 1px solid rgba(255, 255, 255, 0.8);
       display: none;
-    }
-
-    #phototime-fx {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 150vw;
-      height: 150vw;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity .5s;
-      z-index: 9998;
-      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .2) 0%, transparent 50%);
-      will-change: opacity;
-    }
-
-    #phototime-fx.active {
-      opacity: 1;
-    }
-
-    .wish-card.dragging-active {
-      z-index: 500 !important;
     }
   </style>
 </head>
 
 <body oncontextmenu="return false;">
   <div id="scene"></div>
-  <div id="phototime-fx"></div>
 
   <button id="download-btn">원본 다운로드</button>
   <div id="main-title">소원 우주선</div>
@@ -528,6 +497,7 @@
   </div>
 
   <script>
+    // 유틸리티 기능
     document.getElementById('download-btn').addEventListener('click', () => {
       const clone = document.documentElement.cloneNode(true);
       clone.querySelector('#scene').innerHTML = '';
@@ -543,11 +513,10 @@
     const fsBtn = document.getElementById('fullscreen-btn');
     fsBtn.addEventListener('click', () => {
       if (!document.fullscreenElement)
-        document.documentElement.requestFullscreen()
-          .then(() => fsBtn.style.display = 'none')
-          .catch(e => alert(e));
+        document.documentElement.requestFullscreen().then(() => fsBtn.style.display = 'none').catch(e => alert(e));
     });
 
+    // 캔버스 그리기 기능
     const canvas = document.getElementById('draw-canvas');
     const ctx = canvas.getContext('2d');
     const cursorMarker = document.getElementById('cursor-marker');
@@ -557,7 +526,7 @@
     let drawHistory = [];
 
     function saveHistory() {
-      if (drawHistory.length > 4) drawHistory.shift();
+      if (drawHistory.length > 5) drawHistory.shift();
       drawHistory.push(canvas.toDataURL());
     }
 
@@ -755,25 +724,24 @@
       return cc.toDataURL('image/webp', 0.8);
     }
 
+    // ── 물리 엔진 및 로직 ──
     const PHYSICS = {
       MAX_WISHES: 16,
       GRID_COLS: 4,
       GRID_ROWS: 4,
-      REPULSION_K: 0.005,
-      DRAG_PUSH_R: 360,
-      DRAG_PUSH_K: 0.55,
+      REPULSION_FORCE: 0.002,
+      MIN_DIST: 220,
       SPRING_K: 0.015,
-      DAMPING: 0.82,
-      FLOAT_AMP: 9,
+      DAMPING: 0.85,
+      FLOAT_AMP: 7,
       FLOAT_SPEED: 0.018,
-      BOUNDARY_TOP: 110,
-      BOUNDARY_SIDE: 160,
-      BOUNDARY_K: 0.14,
+      BOUNDARY_TOP: 100,
+      BOUNDARY_SIDE: 150,
+      BOUNDARY_K: 0.1,
       COLOR_PALETTE: ["#ff00ea", "#00d2ff", "#39ff14", "#ffeb3b", "#ff6b35", "#b15cff", "#ff5c8d", "#5cffda"],
     };
 
     const scene = document.getElementById('scene');
-    const fxLayer = document.getElementById('phototime-fx');
     let allWishes = [];
     let rafId = null;
     let lastTs = 0;
@@ -783,7 +751,7 @@
     function getBestTarget() {
       const wW = window.innerWidth, wH = window.innerHeight;
       const top = PHYSICS.BOUNDARY_TOP + 30;
-      const bot = bottomSafe() - 80;
+      const bot = bottomSafe() - 100;
       const left = PHYSICS.BOUNDARY_SIDE;
       const right = wW - PHYSICS.BOUNDARY_SIDE;
       const cellW = (right - left) / PHYSICS.GRID_COLS;
@@ -805,77 +773,71 @@
       grid.forEach((row, r) => row.forEach((v, c) => { if (v === minCount) candidates.push({ r, c }); }));
 
       const ch = candidates[Math.floor(Math.random() * candidates.length)];
-      const tx = left + (ch.c + 0.5) * cellW + (Math.random() - 0.5) * cellW * 0.38;
-      const ty = top + (ch.r + 0.5) * cellH + (Math.random() - 0.5) * cellH * 0.38;
+      const tx = left + (ch.c + 0.5) * cellW + (Math.random() - 0.5) * cellW * 0.4;
+      const ty = top + (ch.r + 0.5) * cellH + (Math.random() - 0.5) * cellH * 0.4;
 
       return {
         x: Math.max(left, Math.min(right, tx)),
-        y: Math.max(top, Math.min(bottomSafe() - 90, ty)),
+        y: Math.max(top, Math.min(bottomSafe() - 100, ty)),
       };
     }
 
     function physicsLoop(ts) {
       const dt = Math.min(32, ts - lastTs) / 16.67;
       lastTs = ts;
-
       const wW = window.innerWidth;
       const bot = bottomSafe();
 
       for (let i = 0; i < allWishes.length; i++) {
         const w = allWishes[i];
-        if (w.departing || w.phototime) continue;
+        if (w.departing) continue;
 
         w.phase += PHYSICS.FLOAT_SPEED;
 
-        if (w.dragging) {
-          w.vx = 0; w.vy = 0;
-          continue;
-        }
+        // 크기(스케일)를 자바스크립트로 부드럽게 조절 (렉 방지 핵심)
+        w.scale += (w.targetScale - w.scale) * 0.08 * dt;
 
-        w.vx += (w.targetX - w.x) * PHYSICS.SPRING_K * dt;
-        w.vy += (w.targetY - w.y) * PHYSICS.SPRING_K * dt;
+        // 드래그 중이 아니고 초기 강조(phototime) 상태가 아닐 때만 이동
+        if (!w.dragging && !w.phototime) {
+          w.vx += (w.targetX - w.x) * PHYSICS.SPRING_K * dt;
+          w.vy += (w.targetY - w.y) * PHYSICS.SPRING_K * dt;
 
-        for (let j = 0; j < allWishes.length; j++) {
-          if (i === j || allWishes[j].departing) continue;
-          const o = allWishes[j];
-          const dx = w.x - o.x;
-          const dy = w.y - o.y;
+          for (let j = 0; j < allWishes.length; j++) {
+            if (i === j || allWishes[j].departing || allWishes[j].phototime) continue;
+            const o = allWishes[j];
+            const dx = w.x - o.x;
+            const dy = w.y - o.y;
+            const distSq = dx * dx + dy * dy;
 
-          const absDx = Math.abs(dx);
-          const absDy = Math.abs(dy);
-
-          const minDx = 160;
-          const minDy = 200;
-
-          if (absDx < minDx && absDy < minDy) {
-            const overlapX = minDx - absDx;
-            const overlapY = minDy - absDy;
-
-            if (overlapX < overlapY) {
-              w.vx += overlapX * PHYSICS.REPULSION_K * dt * Math.sign(dx || 1);
-            } else {
-              w.vy += overlapY * PHYSICS.REPULSION_K * dt * Math.sign(dy || 1);
+            if (distSq < PHYSICS.MIN_DIST * PHYSICS.MIN_DIST && distSq > 0) {
+              const dist = Math.sqrt(distSq);
+              const force = (PHYSICS.MIN_DIST - dist) * PHYSICS.REPULSION_FORCE * dt;
+              w.vx += (dx / dist) * force;
+              w.vy += (dy / dist) * force;
             }
           }
+
+          const bk = PHYSICS.BOUNDARY_K * dt;
+          if (w.x < PHYSICS.BOUNDARY_SIDE) w.vx += (PHYSICS.BOUNDARY_SIDE - w.x) * bk;
+          if (w.x > wW - PHYSICS.BOUNDARY_SIDE) w.vx -= (w.x - (wW - PHYSICS.BOUNDARY_SIDE)) * bk;
+          if (w.y < PHYSICS.BOUNDARY_TOP) w.vy += (PHYSICS.BOUNDARY_TOP - w.y) * bk;
+          if (w.y > bot) w.vy -= (w.y - bot) * bk;
         }
 
-        const BL = PHYSICS.BOUNDARY_SIDE, BR = wW - PHYSICS.BOUNDARY_SIDE;
-        const BT = PHYSICS.BOUNDARY_TOP, BB = bot;
-        const bk = PHYSICS.BOUNDARY_K * dt;
-        if (w.x < BL) w.vx += (BL - w.x) * bk;
-        if (w.x > BR) w.vx -= (w.x - BR) * bk;
-        if (w.y < BT) w.vy += (BT - w.y) * bk;
-        if (w.y > BB) w.vy -= (w.y - BB) * bk;
+        if (!w.dragging) {
+          w.vx *= Math.pow(PHYSICS.DAMPING, dt);
+          w.vy *= Math.pow(PHYSICS.DAMPING, dt);
+          w.x += w.vx * dt;
+          w.y += w.vy * dt;
+        }
 
-        w.vx *= Math.pow(PHYSICS.DAMPING, dt);
-        w.vy *= Math.pow(PHYSICS.DAMPING, dt);
-
-        w.x += w.vx * dt;
-        w.y += w.vy * dt;
+        // 스케일이 크거나 드래그 중일 때는 맨 위로 오도록 Z-index 조정
+        w.el.style.zIndex = (w.scale > 1.1 || w.dragging) ? '500' : '10';
 
         const floatY = Math.sin(w.phase) * PHYSICS.FLOAT_AMP;
-        const floatR = Math.sin(w.phase * 0.7) * 1.6;
-        w.el.style.transform = `translate3d(${w.x}px, ${w.y + floatY}px, 0) translate(-50%, -50%) rotate(${floatR}deg)`;
+        const floatR = Math.sin(w.phase * 0.7) * 2;
+
+        w.el.style.transform = `translate3d(${w.x}px, ${w.y + floatY}px, 0) translate(-50%, -50%) scale(${w.scale}) rotate(${floatR}deg)`;
       }
 
       rafId = requestAnimationFrame(physicsLoop);
@@ -887,7 +849,11 @@
       if (!hasDrawn) { document.getElementById('warning-msg').style.opacity = '1'; return; }
       const dataURL = cropCanvas(canvas, 10);
       closeDrawUI();
-      launchWish(dataURL);
+
+      // 그리기 판이 완전히 스르륵 내려가고 난 후(0.4초 대기) 우주선 발사
+      setTimeout(() => {
+        launchWish(dataURL);
+      }, 400);
     });
 
     function launchWish(imgSrc) {
@@ -897,110 +863,79 @@
 
       if (allWishes.length >= PHYSICS.MAX_WISHES) {
         const oldest = allWishes.shift();
-        evictCard(oldest);
+        oldest.departing = true;
+        oldest.el.classList.add('departing');
+        setTimeout(() => { try { oldest.el.remove(); } catch (e) { } }, 2200);
       }
 
       const target = getBestTarget();
-      spawnCard(data, target.x, target.y, false);
+      spawnCard(data, target.x, target.y);
     }
 
-    function evictCard(w) {
-      w.departing = true;
-      w.el.classList.add('departing');
-      setTimeout(() => { try { w.el.remove(); } catch (e) { } }, 2200);
-    }
-
-    function spawnCard(data, finalX, finalY, immediate) {
+    function spawnCard(data, finalX, finalY) {
       const card = document.createElement('div');
-      card.className = 'wish-card';
-      card.style.border = `3px solid ${data.color}`;
-      card.style.zIndex = '10';
+      card.className = 'wish-wrap';
 
       card.innerHTML = `
-    <div class="speech-tail" style="border-top:16px solid ${data.color};"></div>
-    <img src="${data.img}">
-    <div class="drone-base" style="background:url('assets/ship${data.shipId}_bg.png') center/contain no-repeat;">
-      <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
-      <div class="drone-thruster" style="background:radial-gradient(circle,#fff 10%,${data.color} 60%,transparent 100%);"></div>
-    </div>`;
+        <div class="bubble" style="border: 3px solid ${data.color}">
+          <img src="${data.img}">
+          <div class="tail" style="border-top: 15px solid ${data.color}"></div>
+        </div>
+        <div class="ship" style="background-image: url('assets/ship${data.shipId}_bg.png')">
+          <div class="thruster left" style="background: radial-gradient(circle, #fff 20%, ${data.color} 70%)"></div>
+          <div class="thruster right" style="background: radial-gradient(circle, #fff 20%, ${data.color} 70%)"></div>
+        </div>
+      `;
 
       scene.appendChild(card);
 
       const w = {
         el: card,
-        x: immediate ? finalX : window.innerWidth / 2,
-        y: immediate ? finalY : window.innerHeight / 2,
+        x: window.innerWidth / 2,
+        y: window.innerHeight * 0.35, // 중앙보다 살짝 위에서 등장시켜서 밑부분 버튼과 안 겹치게
         vx: 0, vy: 0,
         targetX: finalX,
         targetY: finalY,
         phase: Math.random() * Math.PI * 2,
+        scale: 2.2, // 초기 스케일 2.2배 크게 시작
+        targetScale: 2.2,
         dragging: false,
-        phototime: false,
-        departing: false,
-        createdAt: Date.now(),
-        imgSrc: data.img,
-        color: data.color,
-        shipId: data.shipId,
+        phototime: true, // 초기 멈춤 상태
+        departing: false
       };
+
       allWishes.push(w);
 
-      card.style.transform = `translate3d(${w.x}px, ${w.y}px, 0) translate(-50%, -50%)`;
-
-      if (immediate) return;
-
-      w.phototime = true;
-      card.classList.add('phototime');
-
+      // 3초 후 강조 끝내고 자연스럽게 자리로 찾아가며 작아지기
       setTimeout(() => {
         if (!document.body.contains(card)) return;
         w.phototime = false;
-        card.classList.remove('phototime');
-        w.x = window.innerWidth / 2;
-        w.y = window.innerHeight / 2;
-        w.vx = (Math.random() - 0.5) * 4;
-        w.vy = (Math.random() - 0.5) * 4;
-        card.style.zIndex = '10';
-      }, 5000);
-
-      card.addEventListener('click', e => {
-        if (isAdminMode) {
-          allWishes = allWishes.filter(x => x !== w);
-          evictCard(w);
-          return;
-        }
-        if (w.dragging) return;
-        w.phototime = !w.phototime;
-        if (w.phototime) {
-          card.classList.add('phototime');
-          setTimeout(() => {
-            if (w.phototime) {
-              w.phototime = false;
-              card.classList.remove('phototime');
-              w.x = finalX; w.y = finalY;
-              card.style.zIndex = '10';
-            }
-          }, 5000);
-        } else {
-          card.classList.remove('phototime');
-          w.x = finalX;
-          w.y = finalY;
-          card.style.zIndex = '10';
-        }
-      });
+        w.targetScale = 1; // 스케일 1로 축소 목표 설정
+      }, 3000);
 
       attachDrag(card, w);
     }
 
     function attachDrag(card, w) {
-      let startPX = 0, startPY = 0, startWX = 0, startWY = 0, didDrag = false;
+      let startPX = 0, startPY = 0, startWX = 0, startWY = 0;
 
       function onDown(e) {
-        if (isAdminMode || w.phototime || w.departing) return;
+        if (isAdminMode) {
+          allWishes = allWishes.filter(x => x !== w);
+          w.departing = true;
+          w.el.classList.add('departing');
+          setTimeout(() => { try { w.el.remove(); } catch (e) { } }, 2200);
+          return;
+        }
+        if (w.phototime || w.departing) return;
+
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
-        startPX = cx; startPY = cy; startWX = w.x; startWY = w.y; didDrag = false;
+        startPX = cx; startPY = cy;
+        startWX = w.x; startWY = w.y;
+
         w.dragging = true;
-        card.classList.add('dragging-active');
+        w.vx = 0; w.vy = 0;
         e.stopPropagation();
       }
 
@@ -1008,22 +943,19 @@
         if (!w.dragging) return;
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
-        const dx = cx - startPX, dy = cy - startPY;
-        if (Math.abs(dx) + Math.abs(dy) > 4) didDrag = true;
-        w.x = startWX + dx;
-        w.y = startWY + dy;
-        card.style.transform = `translate3d(${w.x}px, ${w.y}px, 0) translate(-50%,-50%) scale(1.06)`;
+
+        w.x = startWX + (cx - startPX);
+        w.y = startWY + (cy - startPY);
 
         allWishes.forEach(other => {
           if (other === w || other.dragging || other.departing || other.phototime) return;
           const odx = other.x - w.x, ody = other.y - w.y;
-          const d2 = odx * odx + ody * ody;
-          const pr = PHYSICS.DRAG_PUSH_R;
-          if (d2 < pr * pr && d2 > 0.1) {
-            const d = Math.sqrt(d2);
-            const push = (pr - d) * PHYSICS.DRAG_PUSH_K;
-            other.vx += (odx / d) * push;
-            other.vy += (ody / d) * push;
+          const distSq = odx * odx + ody * ody;
+          if (distSq < 300 * 300 && distSq > 0.1) {
+            const dist = Math.sqrt(distSq);
+            const push = (300 - dist) * 0.05;
+            other.vx += (odx / dist) * push;
+            other.vy += (ody / dist) * push;
           }
         });
       }
@@ -1031,12 +963,8 @@
       function onUp() {
         if (!w.dragging) return;
         w.dragging = false;
-        card.classList.remove('dragging-active');
-        card.style.zIndex = '10';
         w.targetX = w.x;
         w.targetY = w.y;
-        w.vx = (Math.random() - 0.5) * 2;
-        w.vy = (Math.random() - 0.5) * 2;
       }
 
       card.addEventListener('mousedown', onDown, { passive: false });

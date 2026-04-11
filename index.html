@@ -36,15 +36,15 @@
       z-index: 5;
     }
 
-    #main-title {
+    /* ── 로고 이미지 ── */
+    #main-logo {
       position: absolute;
-      top: 30px;
-      left: 40px;
+      top: 18px;
+      left: 20px;
       z-index: 200;
-      color: #fff;
-      font-family: 'Black Han Sans', sans-serif;
-      font-size: 40px;
-      letter-spacing: 3px;
+      height: 64px;
+      width: auto;
+      pointer-events: none;
     }
 
     #fullscreen-btn,
@@ -63,13 +63,13 @@
     #fullscreen-btn {
       top: 25px;
       right: 25px;
-      background: rgba(50, 50, 50, 0.8);
+      background: rgb(50, 50, 50);
     }
 
     #download-btn {
       top: 25px;
       left: 25px;
-      background: rgba(0, 150, 75, 0.8);
+      background: rgb(0, 130, 65);
       display: none;
     }
 
@@ -95,8 +95,8 @@
       flex-direction: column;
       align-items: center;
       cursor: grab;
-      will-change: transform;
       z-index: 10;
+      /* will-change 제거 - 저사양 기기에서 VRAM 낭비 */
     }
 
     .wish-wrap:active {
@@ -107,9 +107,11 @@
       cursor: pointer;
     }
 
+    /* ── 핵심 최적화: 말풍선 완전 불투명 처리 ── */
     .bubble {
       position: relative;
-      background: rgba(10, 15, 30, 0.95);
+      background: #0a0f1e;
+      /* rgba 제거, 고정 불투명 색 */
       border-radius: 16px;
       padding: 10px;
       width: max-content;
@@ -151,11 +153,12 @@
     .thruster {
       position: absolute;
       bottom: -10px;
-      width: 20px;
-      height: 30px;
+      width: 18px;
+      height: 26px;
       border-radius: 50%;
+      /* 애니메이션 제거 - 저사양에서 CPU 과부하 원인 */
       background: #fff;
-      animation: thrust 0.3s infinite alternate;
+      opacity: 0.85;
     }
 
     .thruster.left {
@@ -164,18 +167,6 @@
 
     .thruster.right {
       right: 45px;
-    }
-
-    @keyframes thrust {
-      0% {
-        transform: scale(0.8);
-        opacity: 0.7;
-      }
-
-      100% {
-        transform: scale(1.2);
-        opacity: 1;
-      }
     }
 
     .wish-wrap.departing {
@@ -193,7 +184,7 @@
       transform: translateX(-50%);
       padding: 20px 70px;
       font-size: 40px;
-      background: rgba(20, 30, 50, 0.9);
+      background: #141e32;
       color: #fff;
       border: 2px solid rgba(255, 255, 255, 0.5);
       border-radius: 60px;
@@ -211,7 +202,8 @@
       transform: translateX(-50%);
       width: 1000px;
       height: 520px;
-      background: rgba(5, 10, 20, 0.97);
+      background: #050a14;
+      /* 완전 불투명 */
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-bottom: none;
       border-radius: 24px 24px 0 0;
@@ -267,7 +259,7 @@
       padding: 8px 16px;
       font-size: 18px;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(30, 30, 40, 0.7);
+      background: #1e1e28;
       color: #ccc;
       border-radius: 8px;
       font-family: 'Black Han Sans', sans-serif;
@@ -275,7 +267,7 @@
     }
 
     .size-btn.active {
-      background: rgba(255, 255, 255, 0.9);
+      background: #e8e8e8;
       color: #000;
       border-color: #fff;
     }
@@ -291,7 +283,7 @@
     }
 
     #draw-canvas {
-      background: rgba(0, 0, 0, 0.5);
+      background: #000;
       border-radius: 12px;
       flex: 1 1 0;
       min-width: 0;
@@ -304,7 +296,7 @@
     #right-sidebar {
       width: 260px;
       flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.05);
+      background: #0d1120;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       padding: 14px;
@@ -324,7 +316,7 @@
       font-size: 26px;
       width: 100%;
       height: 46px;
-      background: rgba(255, 255, 255, 0.08);
+      background: #1a1e2e;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       cursor: pointer;
@@ -340,7 +332,7 @@
       padding: 8px 0;
       font-size: 16px;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(30, 30, 40, 0.7);
+      background: #1e1e28;
       color: #ccc;
       border-radius: 6px;
       font-family: 'Black Han Sans', sans-serif;
@@ -350,7 +342,7 @@
     }
 
     .ssize-btn.active {
-      background: rgba(255, 255, 255, 0.9);
+      background: #e8e8e8;
       color: #000;
     }
 
@@ -358,7 +350,7 @@
       padding: 12px;
       font-size: 18px;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(30, 30, 40, 0.7);
+      background: #1e1e28;
       color: #fff;
       border-radius: 8px;
       font-family: 'Black Han Sans', sans-serif;
@@ -403,17 +395,17 @@
     }
 
     #undo-btn {
-      background: rgba(40, 100, 160, 0.8);
+      background: #285090;
       color: #fff;
     }
 
     #cancel-btn {
-      background: rgba(100, 100, 110, 0.8);
+      background: #646470;
       color: #fff;
     }
 
     #submit-btn {
-      background: rgba(255, 255, 255, 0.9);
+      background: #e8e8e8;
       color: #000;
       font-size: 30px;
     }
@@ -435,7 +427,10 @@
   <div id="scene"></div>
 
   <button id="download-btn">원본 다운로드</button>
-  <div id="main-title">소원 우주선</div>
+
+  <!-- 로고 이미지로 교체 -->
+  <img id="main-logo" src="logo.webp" alt="포천아트밸리 천문과학관">
+
   <button id="fullscreen-btn">전체화면 시작</button>
   <button id="open-btn">소원 적어 보내기!</button>
   <div id="admin-secret-zone"></div>
@@ -483,7 +478,7 @@
         <span class="tool-title" style="display:block;margin-bottom:8px;">지우기 도구</span>
         <div style="display:flex;gap:8px;">
           <button id="eraser-btn" class="erase-tool-btn">지우개</button>
-          <button id="clear-btn" class="erase-tool-btn" style="background:rgba(255,100,100,0.4);">모두 싹</button>
+          <button id="clear-btn" class="erase-tool-btn" style="background:rgba(255,80,80,0.5);">모두 싹</button>
         </div>
       </div>
     </div>
@@ -497,7 +492,7 @@
   </div>
 
   <script>
-    // 유틸리티 기능
+    // ── 다운로드 / 전체화면 ──
     document.getElementById('download-btn').addEventListener('click', () => {
       const clone = document.documentElement.cloneNode(true);
       clone.querySelector('#scene').innerHTML = '';
@@ -513,10 +508,12 @@
     const fsBtn = document.getElementById('fullscreen-btn');
     fsBtn.addEventListener('click', () => {
       if (!document.fullscreenElement)
-        document.documentElement.requestFullscreen().then(() => fsBtn.style.display = 'none').catch(e => alert(e));
+        document.documentElement.requestFullscreen()
+          .then(() => fsBtn.style.display = 'none')
+          .catch(e => alert(e));
     });
 
-    // 캔버스 그리기 기능
+    // ── 캔버스 그리기 ──
     const canvas = document.getElementById('draw-canvas');
     const ctx = canvas.getContext('2d');
     const cursorMarker = document.getElementById('cursor-marker');
@@ -708,12 +705,17 @@
       if (drawUI.classList.contains('open')) resizeCanvas();
     });
 
-    function cropCanvas(src, padding = 10) {
+    function cropCanvas(src, padding) {
+      padding = padding || 10;
       const c = src.getContext('2d'), w = src.width, h = src.height;
       const data = c.getImageData(0, 0, w, h).data;
       let minX = w, minY = h, maxX = 0, maxY = 0, drawn = false;
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-        if (data[(y * w + x) * 4 + 3] > 0) { drawn = true; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
+        if (data[(y * w + x) * 4 + 3] > 0) {
+          drawn = true;
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+          if (y < minY) minY = y; if (y > maxY) maxY = y;
+        }
       }
       if (!drawn) return src.toDataURL('image/webp', 0.6);
       minX = Math.max(0, minX - padding); minY = Math.max(0, minY - padding);
@@ -724,32 +726,34 @@
       return cc.toDataURL('image/webp', 0.8);
     }
 
-    // ── 물리 엔진 및 로직 ──
+    // ── 물리 엔진 (저사양 최적화) ──
     const PHYSICS = {
-      MAX_WISHES: 16,
+      MAX_WISHES: 12,          // 16→12: 말풍선 수 제한
       GRID_COLS: 4,
-      GRID_ROWS: 4,
+      GRID_ROWS: 3,
       REPULSION_FORCE: 0.002,
       MIN_DIST: 220,
       SPRING_K: 0.015,
       DAMPING: 0.85,
-      FLOAT_AMP: 7,
-      FLOAT_SPEED: 0.018,
+      FLOAT_AMP: 5,            // 7→5: 부유 진폭 축소
+      FLOAT_SPEED: 0.014,      // 0.018→0.014: 속도 감소
       BOUNDARY_TOP: 100,
       BOUNDARY_SIDE: 150,
       BOUNDARY_K: 0.1,
       COLOR_PALETTE: ["#ff00ea", "#00d2ff", "#39ff14", "#ffeb3b", "#ff6b35", "#b15cff", "#ff5c8d", "#5cffda"],
+      // 30fps 목표: ~33ms
+      FRAME_MS: 33,
     };
 
     const scene = document.getElementById('scene');
     let allWishes = [];
-    let rafId = null;
-    let lastTs = 0;
+    let lastRafTs = 0;
+    let frameSkip = 0; // 홀수 프레임마다 반발력 계산 건너뜀
 
     function bottomSafe() { return window.innerHeight - Math.max(200, window.innerHeight * 0.22); }
 
     function getBestTarget() {
-      const wW = window.innerWidth, wH = window.innerHeight;
+      const wW = window.innerWidth;
       const top = PHYSICS.BOUNDARY_TOP + 30;
       const bot = bottomSafe() - 100;
       const left = PHYSICS.BOUNDARY_SIDE;
@@ -771,11 +775,9 @@
       grid.forEach(row => row.forEach(v => { if (v < minCount) minCount = v; }));
       const candidates = [];
       grid.forEach((row, r) => row.forEach((v, c) => { if (v === minCount) candidates.push({ r, c }); }));
-
       const ch = candidates[Math.floor(Math.random() * candidates.length)];
       const tx = left + (ch.c + 0.5) * cellW + (Math.random() - 0.5) * cellW * 0.4;
       const ty = top + (ch.r + 0.5) * cellH + (Math.random() - 0.5) * cellH * 0.4;
-
       return {
         x: Math.max(left, Math.min(right, tx)),
         y: Math.max(top, Math.min(bottomSafe() - 100, ty)),
@@ -783,37 +785,43 @@
     }
 
     function physicsLoop(ts) {
-      const dt = Math.min(32, ts - lastTs) / 16.67;
-      lastTs = ts;
+      // ── 30fps 스로틀: 33ms 미만이면 건너뜀 ──
+      if (ts - lastRafTs < PHYSICS.FRAME_MS) {
+        requestAnimationFrame(physicsLoop);
+        return;
+      }
+      const dt = Math.min(2.0, (ts - lastRafTs) / 16.67);
+      lastRafTs = ts;
+      frameSkip++;
+
       const wW = window.innerWidth;
       const bot = bottomSafe();
+      const doRepulsion = (frameSkip % 2 === 0); // 한 프레임 걸러 반발력 계산
 
       for (let i = 0; i < allWishes.length; i++) {
         const w = allWishes[i];
         if (w.departing) continue;
 
         w.phase += PHYSICS.FLOAT_SPEED;
-
-        // 크기(스케일)를 자바스크립트로 부드럽게 조절 (렉 방지 핵심)
         w.scale += (w.targetScale - w.scale) * 0.08 * dt;
 
-        // 드래그 중이 아니고 초기 강조(phototime) 상태가 아닐 때만 이동
         if (!w.dragging && !w.phototime) {
           w.vx += (w.targetX - w.x) * PHYSICS.SPRING_K * dt;
           w.vy += (w.targetY - w.y) * PHYSICS.SPRING_K * dt;
 
-          for (let j = 0; j < allWishes.length; j++) {
-            if (i === j || allWishes[j].departing || allWishes[j].phototime) continue;
-            const o = allWishes[j];
-            const dx = w.x - o.x;
-            const dy = w.y - o.y;
-            const distSq = dx * dx + dy * dy;
-
-            if (distSq < PHYSICS.MIN_DIST * PHYSICS.MIN_DIST && distSq > 0) {
-              const dist = Math.sqrt(distSq);
-              const force = (PHYSICS.MIN_DIST - dist) * PHYSICS.REPULSION_FORCE * dt;
-              w.vx += (dx / dist) * force;
-              w.vy += (dy / dist) * force;
+          // 반발력은 격 프레임만 계산
+          if (doRepulsion) {
+            for (let j = 0; j < allWishes.length; j++) {
+              if (i === j || allWishes[j].departing || allWishes[j].phototime) continue;
+              const o = allWishes[j];
+              const dx = w.x - o.x, dy = w.y - o.y;
+              const distSq = dx * dx + dy * dy;
+              if (distSq < PHYSICS.MIN_DIST * PHYSICS.MIN_DIST && distSq > 0) {
+                const dist = Math.sqrt(distSq);
+                const force = (PHYSICS.MIN_DIST - dist) * PHYSICS.REPULSION_FORCE * dt;
+                w.vx += (dx / dist) * force;
+                w.vy += (dy / dist) * force;
+              }
             }
           }
 
@@ -831,29 +839,30 @@
           w.y += w.vy * dt;
         }
 
-        // 스케일이 크거나 드래그 중일 때는 맨 위로 오도록 Z-index 조정
         w.el.style.zIndex = (w.scale > 1.1 || w.dragging) ? '500' : '10';
 
         const floatY = Math.sin(w.phase) * PHYSICS.FLOAT_AMP;
-        const floatR = Math.sin(w.phase * 0.7) * 2;
+        const floatR = Math.sin(w.phase * 0.7) * 1.5;
 
-        w.el.style.transform = `translate3d(${w.x}px, ${w.y + floatY}px, 0) translate(-50%, -50%) scale(${w.scale}) rotate(${floatR}deg)`;
+        // transform을 정수 픽셀로 반올림 → 서브픽셀 렌더링 연산 절감
+        const px = Math.round(w.x);
+        const py = Math.round(w.y + floatY);
+        const sc = Math.round(w.scale * 100) / 100;
+        const ro = Math.round(floatR * 10) / 10;
+
+        w.el.style.transform = `translate3d(${px}px,${py}px,0) translate(-50%,-50%) scale(${sc}) rotate(${ro}deg)`;
       }
 
-      rafId = requestAnimationFrame(physicsLoop);
+      requestAnimationFrame(physicsLoop);
     }
 
-    rafId = requestAnimationFrame(t => { lastTs = t; physicsLoop(t); });
+    requestAnimationFrame(physicsLoop);
 
     document.getElementById('submit-btn').addEventListener('click', () => {
       if (!hasDrawn) { document.getElementById('warning-msg').style.opacity = '1'; return; }
       const dataURL = cropCanvas(canvas, 10);
       closeDrawUI();
-
-      // 그리기 판이 완전히 스르륵 내려가고 난 후(0.4초 대기) 우주선 발사
-      setTimeout(() => {
-        launchWish(dataURL);
-      }, 400);
+      setTimeout(() => launchWish(dataURL), 400);
     });
 
     function launchWish(imgSrc) {
@@ -882,8 +891,8 @@
           <div class="tail" style="border-top: 15px solid ${data.color}"></div>
         </div>
         <div class="ship" style="background-image: url('assets/ship${data.shipId}_bg.png')">
-          <div class="thruster left" style="background: radial-gradient(circle, #fff 20%, ${data.color} 70%)"></div>
-          <div class="thruster right" style="background: radial-gradient(circle, #fff 20%, ${data.color} 70%)"></div>
+          <div class="thruster left" style="background:${data.color}"></div>
+          <div class="thruster right" style="background:${data.color}"></div>
         </div>
       `;
 
@@ -892,25 +901,24 @@
       const w = {
         el: card,
         x: window.innerWidth / 2,
-        y: window.innerHeight * 0.35, // 중앙보다 살짝 위에서 등장시켜서 밑부분 버튼과 안 겹치게
+        y: window.innerHeight * 0.35,
         vx: 0, vy: 0,
         targetX: finalX,
         targetY: finalY,
         phase: Math.random() * Math.PI * 2,
-        scale: 2.2, // 초기 스케일 2.2배 크게 시작
+        scale: 2.2,
         targetScale: 2.2,
         dragging: false,
-        phototime: true, // 초기 멈춤 상태
+        phototime: true,
         departing: false
       };
 
       allWishes.push(w);
 
-      // 3초 후 강조 끝내고 자연스럽게 자리로 찾아가며 작아지기
       setTimeout(() => {
         if (!document.body.contains(card)) return;
         w.phototime = false;
-        w.targetScale = 1; // 스케일 1로 축소 목표 설정
+        w.targetScale = 1;
       }, 3000);
 
       attachDrag(card, w);
@@ -928,12 +936,10 @@
           return;
         }
         if (w.phototime || w.departing) return;
-
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
         startPX = cx; startPY = cy;
         startWX = w.x; startWY = w.y;
-
         w.dragging = true;
         w.vx = 0; w.vy = 0;
         e.stopPropagation();
@@ -943,7 +949,6 @@
         if (!w.dragging) return;
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
-
         w.x = startWX + (cx - startPX);
         w.y = startWY + (cy - startPY);
 

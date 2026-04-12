@@ -60,8 +60,9 @@
       cursor: pointer;
     }
 
+    /* 관리자 시크릿 존과 겹치지 않도록 전체화면 버튼 위치 수정 */
     #fullscreen-btn {
-      top: 25px;
+      top: 170px;
       right: 25px;
       background: rgb(50, 50, 50);
     }
@@ -283,10 +284,8 @@
       min-height: 200px;
       touch-action: none;
       border: 2px solid rgba(255, 255, 255, 0.2);
-      /* 저사양 최적화: 렉 유발하는 그림자 및 애니메이션 완전 제거 */
     }
 
-    /* 초경량 지우개 시각 효과 (점선 테두리만 변경) */
     #draw-canvas.eraser-mode {
       border: 3px dashed #ffc864;
     }
@@ -570,7 +569,7 @@
       });
     });
 
-    // 지우개 버튼 이벤트 (명확한 토글 방식)
+    // 지우개 버튼 이벤트
     const eraserBtn = document.getElementById('eraser-btn');
     eraserBtn.addEventListener('click', () => {
       eraserMode = !eraserMode;
@@ -678,7 +677,6 @@
     window.addEventListener('touchend', endDraw);
     canvas.addEventListener('touchcancel', endDraw);
 
-
     const drawUI = document.getElementById('draw-ui');
     const openBtn = document.getElementById('open-btn');
 
@@ -696,9 +694,8 @@
       requestAnimationFrame(() => requestAnimationFrame(resizeCanvas));
     });
 
-    // ── 작성 취소 (바로 닫기, 팝업 없음) ──
+    // ── 작성 취소 (바로 닫기) ──
     document.getElementById('cancel-btn').addEventListener('click', () => {
-      // 캔버스를 비우고 창을 바로 닫습니다.
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       hasDrawn = false;
       document.getElementById('warning-msg').style.opacity = '0';
@@ -730,22 +727,22 @@
       return cc.toDataURL('image/webp', 0.8);
     }
 
-    // ── 물리 엔진 ──
+    // ── 물리 엔진 (수정됨) ──
     const PHYSICS = {
       MAX_WISHES: 12,
       GRID_COLS: 4,
       GRID_ROWS: 3,
-      REPULSION_FORCE: 0.002,
-      MIN_DIST: 220,
-      SPRING_K: 0.015,
+      REPULSION_FORCE: 0.001,  // 밀어내는 힘 부드럽게 조정
+      MIN_DIST: 240,           // 밀어내기 시작하는 거리 확장
+      SPRING_K: 0.012,         // 제자리로 돌아가는 장력 완화
       DAMPING: 0.85,
-      FLOAT_AMP: 5,
-      FLOAT_SPEED: 0.014,
+      FLOAT_AMP: 6,            // 위아래 떠다니는 진폭 증가
+      FLOAT_SPEED: 0.035,      // 떠다니는 속도 증가 (30fps 방어)
       BOUNDARY_TOP: 100,
       BOUNDARY_SIDE: 150,
-      BOUNDARY_K: 0.1,
+      BOUNDARY_K: 0.05,        // 화면 끝 반발력 완화
       COLOR_PALETTE: ["#ff00ea", "#00d2ff", "#39ff14", "#ffeb3b", "#ff6b35", "#b15cff", "#ff5c8d", "#5cffda"],
-      FRAME_MS: 33,
+      FRAME_MS: 33,            // 프레임 제한
     };
 
     const scene = document.getElementById('scene');
@@ -798,7 +795,6 @@
 
       const wW = window.innerWidth;
       const bot = bottomSafe();
-      const doRepulsion = (frameSkip % 2 === 0);
 
       for (let i = 0; i < allWishes.length; i++) {
         const w = allWishes[i];
@@ -811,18 +807,17 @@
           w.vx += (w.targetX - w.x) * PHYSICS.SPRING_K * dt;
           w.vy += (w.targetY - w.y) * PHYSICS.SPRING_K * dt;
 
-          if (doRepulsion) {
-            for (let j = 0; j < allWishes.length; j++) {
-              if (i === j || allWishes[j].departing || allWishes[j].phototime) continue;
-              const o = allWishes[j];
-              const dx = w.x - o.x, dy = w.y - o.y;
-              const distSq = dx * dx + dy * dy;
-              if (distSq < PHYSICS.MIN_DIST * PHYSICS.MIN_DIST && distSq > 0) {
-                const dist = Math.sqrt(distSq);
-                const force = (PHYSICS.MIN_DIST - dist) * PHYSICS.REPULSION_FORCE * dt;
-                w.vx += (dx / dist) * force;
-                w.vy += (dy / dist) * force;
-              }
+          // 매 프레임 자연스럽게 밀어내기 (부르르 떨림 해결)
+          for (let j = 0; j < allWishes.length; j++) {
+            if (i === j || allWishes[j].departing || allWishes[j].phototime) continue;
+            const o = allWishes[j];
+            const dx = w.x - o.x, dy = w.y - o.y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < PHYSICS.MIN_DIST * PHYSICS.MIN_DIST && distSq > 0) {
+              const dist = Math.sqrt(distSq);
+              const force = (PHYSICS.MIN_DIST - dist) * PHYSICS.REPULSION_FORCE * dt;
+              w.vx += (dx / dist) * force;
+              w.vy += (dy / dist) * force;
             }
           }
 
